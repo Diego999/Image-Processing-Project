@@ -20,12 +20,13 @@ private:
     static const double MAXIMUM_WEIGHT;
 
     void initializeWeights();
-    void initializePrevWeights();
+    void initializePrevWeightsAndDelta();
 
     int m_nbInputs;
 
     std::vector<double> m_weights;
     std::vector<double> m_prevWeights; // For the momentum
+    std::vector<double> m_deltas;
 };
 
 #endif // NEURON_H

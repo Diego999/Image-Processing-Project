@@ -7,7 +7,7 @@ const double Neuron::MINIMUM_WEIGHT = -1.0;
 Neuron::Neuron(int nbInputs):m_nbInputs(nbInputs)
 {
     initializeWeights();
-    initializePrevWeights();
+    initializePrevWeightsAndDelta();
 }
 
 Neuron::~Neuron()
@@ -23,7 +23,7 @@ void Neuron::loadNewWeights(const std::vector<double>& inputs)
     for(auto& val : inputs)
         m_weights.push_back(val);
 
-    initializePrevWeights();
+    initializePrevWeightsAndDelta();
 }
 
 void Neuron::initializeWeights()
@@ -33,10 +33,14 @@ void Neuron::initializeWeights()
         m_weights.push_back(val);
 }
 
-void Neuron::initializePrevWeights()
+void Neuron::initializePrevWeightsAndDelta()
 {
     m_prevWeights.clear();
+    m_deltas.clear();
     for(int i = 0; i < m_nbInputs+1; ++i)
+    {
         m_prevWeights.push_back(0);
+        m_deltas.push_back(0);
+    }
 }
 
