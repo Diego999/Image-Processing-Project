@@ -11,12 +11,13 @@ public:
 
     int inputNb() const {return m_nbInputs;}
 
-    std::vector<double> weights() const {return m_weights;}
-    std::vector<double> prevWeights() const {return m_prevWeights;}
-    std::vector<double> deltas() const {return m_deltas;}
+    const std::vector<double>& weights() const {return m_weights;}
+    const std::vector<double>& prevWeights() const {return m_prevWeights;}
+    const std::vector<double>& deltas() const {return m_deltas;}
 
     double weight(int i) const {return m_weights[i];}
     const double& operator[](int i) const {return m_weights[i];}
+    double& operator[](int i) {return m_weights[i];}
 
     void loadNewWeights(const std::vector<double>& inputs);
 
