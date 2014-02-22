@@ -9,6 +9,40 @@ NeuronLayer::NeuronLayer(int nbNeurons, int nbInputs):m_nbNeurons(nbNeurons)
 
 NeuronLayer::~NeuronLayer()
 {
-    //Pointers will be deleted when there won't be any references
+
 }
 
+double NeuronLayer::outputNeuron(int neuron) const
+{
+    return m_neurons[neuron]->output();
+}
+
+double NeuronLayer::weightNeuron(int neuron, int i) const
+{
+    return m_neurons[neuron]->weight(i);
+}
+
+void NeuronLayer::weightNeuron(int neuron, int i, double v)
+{
+    m_neurons[neuron]->weight(i, v);
+}
+
+double NeuronLayer::prevWeightNeuron(int neuron, int i) const
+{
+    return m_neurons[neuron]->prevWeight(i);
+}
+
+void NeuronLayer::prevWeightNeuron(int neuron, int i, double v)
+{
+    m_neurons[neuron]->prevWeight(i, v);
+}
+
+double NeuronLayer::deltaNeuron(int neuron) const
+{
+    return m_neurons[neuron]->delta();
+}
+
+void NeuronLayer::deltaNeuron(int neuron, double d)
+{
+    m_neurons[neuron]->delta(d);
+}
