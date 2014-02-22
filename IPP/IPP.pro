@@ -30,10 +30,12 @@ SOURCES += src/main.cpp \
     src/Utils/utils.cpp \
     src/NeuralNetwork/neuron.cpp \
     src/NeuralNetwork/neuronlayer.cpp \
-    src/Utils/settings.cpp
+    src/Utils/settings.cpp \
+    src/NeuralNetwork/artificialneuralnetwork.cpp
 
 HEADERS += \
     include/Utils/utils.h \
     include/NeuralNetwork/neuron.h \
     include/NeuralNetwork/neuronlayer.h \
-    include/Utils/settings.h
+    include/Utils/settings.h \
+    include/NeuralNetwork/artificialneuralnetwork.h
