@@ -2,32 +2,23 @@
 #include "include/NeuralNetwork/neuronlayer.h"
 #include "include/NeuralNetwork/neuron.h"
 
-#include <iostream>
 #include <cmath>
-#include <memory>
-
-double ArtificialNeuralNetwork::squashingFunction(double x)
-{
-    return 1.0/(1.0+exp(x));
-}
+#include <cassert>
 
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers, int nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbHiddenLayers), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
-    m_inputs.push_back(std::vector<double>(m_nbInputs+1)); //+1 -> threshold input (=1.0)
-    m_inputs[0][0] = 1.0;
+    m_inputs.push_back(std::vector<double>(m_nbInputs));
 
     for(int i = 0; i < m_nbHiddenLayers; ++i)
     {
         m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbNeuronsPerHiddenLayer, m_nbInputs)));
-        m_delta.push_back(0);
-
-        m_inputs.push_back(std::vector<double>(m_nbNeuronsPerHiddenLayer+1, 0)); //+1 -> threshold input (=1.0)
-        m_inputs[i+1][0] = 1.0;
+        m_inputs.push_back(std::vector<double>(m_nbNeuronsPerHiddenLayer, 0));
+        m_errors.push_back(0);
     }
-    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbOutputs, m_nbNeuronsPerHiddenLayer))); // Output is considered as a layer, contrary the inputs
+    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbOutputs, m_nbNeuronsPerHiddenLayer))); // Output is considered as a layer, contrary to the inputs
     m_inputs.push_back(std::vector<double>(m_nbOutputs, 0)); //To simplify the feedforward, the output of the ith-1 layer are the inputs of the ith layer. For the last layer (outputs), it is only outputs
-    m_delta.push_back(0); //outputs
+    m_errors.push_back(0); //outputs
 
     for(int i = 0; i < m_nbOutputs; ++i)
         m_targets.push_back(0);
@@ -53,7 +44,12 @@ double ArtificialNeuralNetwork::train(const std::vector<double>& dataInputs, con
 
 double ArtificialNeuralNetwork::train()
 {
-    return 0;
+    layerForward();
+    double errorTot = 0;
+    errorTot += computeOutputError();
+    errorTot += computeHiddenError();
+    adjustWeights();
+    return errorTot;
 }
 
 const std::vector<double>& ArtificialNeuralNetwork::feedForward()
@@ -65,28 +61,67 @@ const std::vector<double>& ArtificialNeuralNetwork::feedForward()
 void ArtificialNeuralNetwork::layerForward()
 {
     for(size_t i = 0; i < m_layers.size(); ++i)
-    {
-        int j = 1; //To fill the real values and not the thresold
-        for(auto& neuron : m_layers[i]->neurons())
+        for(size_t j = 0; j < m_layers[i]->size(); ++j)
         {
-            double sum = 0.0;
-            for(auto& input : m_inputs[i])
-                sum += neuron->weight(i)*input;
-            // i+1 -> Next layer
-            m_inputs[i+1][j++] = ArtificialNeuralNetwork::squashingFunction(sum);
+            double output = m_layers[i]->neuron(j)->computeOutput(m_inputs[i]);
+            m_inputs[i+1][j] = output;
         }
-    }
 }
 
-const std::vector<double>& ArtificialNeuralNetwork::weight(int numLayer, int numNeuron) const
+double ArtificialNeuralNetwork::computeOutputError()
 {
-    return (*m_layers[numLayer])[numNeuron]->weights();
+    double totErr = 0.0;
+    for(size_t i = 0; i < m_layers.back()->size(); ++i)
+        for(int j = 0; j < m_nbOutputs; ++j)
+        {
+            double o = m_inputs.back()[j];
+            double t = m_targets[j];
+            double delta = o*(1.0-o)*(t-o);
+            m_layers.back()->deltaNeuron(j, delta);
+            totErr += abs(delta);
+        }
+    return totErr;
+}
+
+double ArtificialNeuralNetwork::computeHiddenError()
+{
+    //Should we add the delta*threshold to the sum ?
+    double totErrAllHiddenLayer = 0.0;
+    for(size_t i = m_layers.size()-1; i > 0 ; --i)
+    {
+        double totErrHiddenLayer = 0.0;
+        for(size_t j = 0; j < m_layers[i-1]->size(); ++j)
+        {
+            double sum = 0.0;
+            for(size_t k = 0; k < m_layers[i]->size(); ++k)
+                sum += m_layers[i]->deltaNeuron(k)*m_layers[i]->weightNeuron(k, j);
+
+            double h = m_layers[i-1]->outputNeuron(j);
+            double delta = h*(1.0-h)*sum;
+            m_layers[i-1]->deltaNeuron(j, delta);
+            totErrHiddenLayer += abs(delta);
+        }
+        totErrAllHiddenLayer += totErrHiddenLayer;
+    }
+    return totErrAllHiddenLayer;
+}
+
+void ArtificialNeuralNetwork::adjustWeights()
+{
+    for(size_t i = 0; i < m_layers.size(); ++i)
+        for(auto& neuron : m_layers[i]->neurons())
+            for(size_t j = 0; j < m_inputs[i].size(); ++j)
+                neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevWeight(j));
+}
+
+std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const
+{
+    return m_layers[numLayer]->neuron(numNeuron)->weights();
 }
 
 void ArtificialNeuralNetwork::inputs(const std::vector<double>& dataInputs)
 {
-    if(dataInputs.size() != static_cast<size_t>(m_nbInputs))
-        std::cerr << "[ArtificialNeuralNetwork::inputs] dataInputs don't have the same size that inputs" << std::endl;
+    assert(dataInputs.size() == static_cast<size_t>(m_nbInputs));
 
     m_inputs[0].clear();
     for(auto& val : dataInputs)
@@ -95,8 +130,8 @@ void ArtificialNeuralNetwork::inputs(const std::vector<double>& dataInputs)
 
 void ArtificialNeuralNetwork::targets(const std::vector<double>& dataTargets)
 {
-    if(dataTargets.size() != static_cast<size_t>(m_nbOutputs))
-        std::cerr << "[ArtificialNeuralNetwork::targs] dataTargets don't have the same size that outputs" << std::endl;
+    assert(dataTargets.size() == static_cast<size_t>(m_nbOutputs));
+
     m_targets.clear();
     for(auto& val : dataTargets)
         m_targets.push_back(val);

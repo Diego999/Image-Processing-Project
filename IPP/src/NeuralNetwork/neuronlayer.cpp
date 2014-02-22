@@ -12,6 +12,11 @@ NeuronLayer::~NeuronLayer()
 
 }
 
+void NeuronLayer::updateWeightNeuron(int neuron, int i, double v)
+{
+    return m_neurons[neuron]->updateWeight(i, v);
+}
+
 double NeuronLayer::outputNeuron(int neuron) const
 {
     return m_neurons[neuron]->output();

@@ -25,6 +25,8 @@ public:
     double deltaNeuron(int neuron) const;
     void deltaNeuron(int neuron, double d);
 
+    void updateWeightNeuron(int neuron, int i, double v);
+
     double outputNeuron(int neuron) const;
 
     const std::shared_ptr<Neuron>& neuron(int i) const {return m_neurons[i];}

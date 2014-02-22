@@ -23,8 +23,10 @@ public:
     double weight(int i) const {return m_weights[i+1];}
     void weight(int i, double v) {m_weights[i+1] = v;}
 
-    double prevWeight(int i) const {return m_prevWeights[i];}
-    void prevWeight(int i, double v) {m_prevWeights[i] = v;}
+    double prevWeight(int i) const {return m_prevWeights[i+1];}
+    void prevWeight(int i, double v) {m_prevWeights[i+1] = v;}
+
+    void updateWeight(int i, double v) {m_prevWeights[i] = m_weights[i]; m_weights[i] = v;}
 
     double delta() const {return m_delta;}
     void delta(double d) {m_delta=d;}

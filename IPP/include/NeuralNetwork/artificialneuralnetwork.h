@@ -5,9 +5,12 @@
 
 class NeuronLayer;
 
+//Works only with one layer of hidden layer !
+
 class ArtificialNeuralNetwork
 {
 public:
+    //The inputs is not consider as a layer !
     ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers, int nbNeuronsPerHiddenLayer, double learningRate, double momentum);
     ~ArtificialNeuralNetwork();
 
@@ -25,19 +28,19 @@ public:
     int nbHiddenLayers() const {return m_nbHiddenLayers;}
     int nbNeuronsPerHiddenLayer() const {return m_nbNeuronsPerHiddenLayer;}
 
-    const std::vector<double>& weight(int numLayer, int numNeuron) const;
+    std::vector<double> weights(int numLayer, int numNeuron) const;
 
     void inputs(const std::vector<double>& dataInputs);
     void targets(const std::vector<double>& dataTargets);
 
     const std::vector<double>& inputs() const {return m_inputs[0];}
     const std::vector<double>& outputs() const {return m_inputs.back();}
-    const std::vector<double>& delta() const {return m_delta;}
 
 private:
-    static double squashingFunction(double x);
-
     void layerForward();
+    double computeHiddenError();
+    double computeOutputError();
+    void adjustWeights();
 
     int m_nbInputs;
     int m_nbOutputs;
@@ -46,8 +49,8 @@ private:
 
     std::vector<std::shared_ptr<NeuronLayer>> m_layers;
     std::vector<std::vector<double>> m_inputs;
-    std::vector<double> m_targets;
-    std::vector<double> m_delta;
+    std::vector<double> m_errors; //By layer
+    std::vector<double> m_targets; //Supposed outputs vector
 
     double m_learningRate;
     double m_momentum;
