@@ -14,6 +14,9 @@ public:
     int nbNeurons() const {return m_nbNeurons;}
     std::vector<std::shared_ptr<Neuron>> neurons() const {return m_neurons;}
 
+    const std::shared_ptr<Neuron>& neuron(int i) const {return m_neurons[i];}
+    const std::shared_ptr<Neuron>& operator[](int i) const {return m_neurons[i];}
+
 private:
     int m_nbNeurons;
     std::vector<std::shared_ptr<Neuron>> m_neurons;
