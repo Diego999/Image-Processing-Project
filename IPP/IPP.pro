@@ -26,4 +26,14 @@ macx {
 
 CONFIG +=c++11
 
-SOURCES += main.cpp
+SOURCES += src/main.cpp \
+    src/Utils/utils.cpp \
+    src/NeuralNetwork/neuron.cpp \
+    src/NeuralNetwork/neuronlayer.cpp \
+    src/Utils/settings.cpp
+
+HEADERS += \
+    include/Utils/utils.h \
+    include/NeuralNetwork/neuron.h \
+    include/NeuralNetwork/neuronlayer.h \
+    include/Utils/settings.h
