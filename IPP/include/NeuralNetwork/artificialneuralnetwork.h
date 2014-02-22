@@ -2,7 +2,6 @@
 #define ARTIFICIAL_NEURAL_NETWORK_H
 
 #include <vector>
-#include <memory>
 
 class NeuronLayer;
 
@@ -15,8 +14,8 @@ public:
     double learningRate() const {return m_learningRate;}
     double momentum() const {return m_momentum;}
 
-    const std::vector<double>& feedforward(); //Use inputs(...) before and then ouputs
-    const std::vector<double>& feedforward(const std::vector<double>& dataInputs);
+    const std::vector<double>& feedForward(); //Use inputs(...) before and then ouputs
+    const std::vector<double>& feedForward(const std::vector<double>& dataInputs);
 
     double train(); // Use inputs(...), targets(...) before
     double train(const std::vector<double>& dataInputs, const std::vector<double>& dataTargets);
@@ -31,11 +30,14 @@ public:
     void inputs(const std::vector<double>& dataInputs);
     void targets(const std::vector<double>& dataTargets);
 
-    const std::vector<double>& inputs() const {return m_inputs;}
+    const std::vector<double>& inputs() const {return m_inputs[0];}
+    const std::vector<double>& outputs() const {return m_inputs.back();}
     const std::vector<double>& delta() const {return m_delta;}
 
 private:
     static double squashingFunction(double x);
+
+    void layerForward();
 
     int m_nbInputs;
     int m_nbOutputs;
@@ -43,10 +45,8 @@ private:
     int m_nbNeuronsPerHiddenLayer;
 
     std::vector<std::shared_ptr<NeuronLayer>> m_layers;
-    std::vector<double> m_inputs;
+    std::vector<std::vector<double>> m_inputs;
     std::vector<double> m_targets;
-    std::vector<double> m_outputs;
-
     std::vector<double> m_delta;
 
     double m_learningRate;
