@@ -2,6 +2,7 @@
 #define ARTIFICIAL_NEURAL_NETWORK_H
 
 #include <vector>
+#include <initializer_list>
 
 class NeuronLayer;
 
@@ -9,7 +10,7 @@ class ArtificialNeuralNetwork
 {
 public:
     //The inputs is not consider as a layer !
-    ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers, int nbNeuronsPerHiddenLayer, double learningRate, double momentum);
+    ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers, std::initializer_list<int> nbNeuronsPerHiddenLayer, double learningRate, double momentum);
     ~ArtificialNeuralNetwork();
 
     double learningRate() const {return m_learningRate;}
@@ -24,7 +25,7 @@ public:
     int nbInputs() const {return m_nbInputs;}
     int nbOutputs() const {return m_nbOutputs;}
     int nbHiddenLayers() const {return m_nbHiddenLayers;}
-    int nbNeuronsPerHiddenLayer() const {return m_nbNeuronsPerHiddenLayer;}
+    std::initializer_list<int> nbNeuronsPerHiddenLayer() const {return m_nbNeuronsPerHiddenLayer;}
 
     std::vector<double> weights(int numLayer, int numNeuron) const;
 
@@ -43,7 +44,7 @@ private:
     int m_nbInputs;
     int m_nbOutputs;
     int m_nbHiddenLayers;
-    int m_nbNeuronsPerHiddenLayer;
+    std::initializer_list<int> m_nbNeuronsPerHiddenLayer;
 
     std::vector<std::shared_ptr<NeuronLayer>> m_layers;
     std::vector<std::vector<double>> m_inputs;
