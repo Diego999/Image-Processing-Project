@@ -14,11 +14,9 @@ ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, in
     {
         m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbNeuronsPerHiddenLayer, m_nbInputs)));
         m_inputs.push_back(std::vector<double>(m_nbNeuronsPerHiddenLayer, 0));
-        m_errors.push_back(0);
     }
     m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbOutputs, m_nbNeuronsPerHiddenLayer))); // Output is considered as a layer, contrary to the inputs
     m_inputs.push_back(std::vector<double>(m_nbOutputs, 0)); //To simplify the feedforward, the output of the ith-1 layer are the inputs of the ith layer. For the last layer (outputs), it is only outputs
-    m_errors.push_back(0); //outputs
 
     for(int i = 0; i < m_nbOutputs; ++i)
         m_targets.push_back(0);

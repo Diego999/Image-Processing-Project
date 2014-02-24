@@ -37,7 +37,6 @@ public:
     void loadNewWeights(const std::vector<double>& inputs);
     void changeWeights(const std::vector<double>& newWeights); //Transfer weights[i] -> oldWeights[i]
 
-
 private:
     static const double MINIMUM_WEIGHT;
     static const double MAXIMUM_WEIGHT;

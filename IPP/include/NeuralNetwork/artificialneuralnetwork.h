@@ -5,8 +5,6 @@
 
 class NeuronLayer;
 
-//Works only with one layer of hidden layer !
-
 class ArtificialNeuralNetwork
 {
 public:
@@ -49,7 +47,6 @@ private:
 
     std::vector<std::shared_ptr<NeuronLayer>> m_layers;
     std::vector<std::vector<double>> m_inputs;
-    std::vector<double> m_errors; //By layer
     std::vector<double> m_targets; //Supposed outputs vector
 
     double m_learningRate;
