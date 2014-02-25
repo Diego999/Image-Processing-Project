@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cassert>
 
-ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers,  std::initializer_list<int> nbNeuronsPerHiddenLayer, double learningRate, double momentum)
+ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers,  const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbHiddenLayers), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
     m_inputs.push_back(std::vector<double>(m_nbInputs));
@@ -83,7 +83,6 @@ double ArtificialNeuralNetwork::computeOutputError()
 
 double ArtificialNeuralNetwork::computeHiddenError()
 {
-    //Should we add the delta*threshold to the sum ?
     double totErrAllHiddenLayer = 0.0;
     for(size_t i = m_layers.size()-1; i > 0 ; --i)
     {
