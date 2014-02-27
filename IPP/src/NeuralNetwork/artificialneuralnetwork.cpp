@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers,  const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbHiddenLayers), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
@@ -113,6 +114,7 @@ void ArtificialNeuralNetwork::adjustWeights()
             {
                 double delta = neuron->delta();
                 double prevWeight = neuron->prevWeight(j);
+                //std::cout << (m_learningRate*delta*m_inputs[i][j] + m_momentum*prevWeight) << std::endl;
                 neuron->updateWeight(j, m_learningRate*delta*m_inputs[i][j] + m_momentum*prevWeight);
             }
             neuron->updateThreshold(m_learningRate*neuron->delta() + m_momentum*neuron->prevThreshold());
