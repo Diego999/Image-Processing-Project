@@ -26,7 +26,11 @@ public:
     double prevWeight(int i) const {return m_prevWeights[i+1];}
     void prevWeight(int i, double v) {m_prevWeights[i+1] = v;}
 
-    void updateWeight(int i, double v) {m_prevWeights[i] = m_weights[i]; m_weights[i] = v;}
+    double prevThreshold() const {return m_prevWeights[0];}
+    void prevThreshold(double v) {m_prevWeights[0] = v;}
+
+    void updateWeight(int i, double v) {m_prevWeights[i+1] = m_weights[i+1]; m_weights[i+1] += v;}
+    void updateThreshold(double v) {m_prevWeights[0] = m_weights[0]; m_weights[0] += v;}
 
     double delta() const {return m_delta;}
     void delta(double d) {m_delta=d;}

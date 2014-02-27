@@ -28,12 +28,16 @@ std::vector<int> ipp_random::randIntList(int a, int b, int n)
 
 std::vector<double> ipp_random::randDoubleList(double a, double b, int n)
 {
-    static std::default_random_engine generator;
-    std::uniform_real_distribution<double> distribution(a, b);
+    //static std::default_random_engine generator(time(0));
+    //std::uniform_real_distribution<double> distribution(a, b);
+    static double aa = -0.5;
     std::vector<double> output(n);
 
     for(int i = 0; i < n; ++i)
-            output[i] = distribution(generator);
+    {
+            output[i] = aa;//distribution(generator);
+            aa += 0.1;
+    }
 
     return output;
 }

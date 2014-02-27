@@ -8,6 +8,7 @@
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers,  const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbHiddenLayers), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
+    assert(nbHiddenLayers == nbNeuronsPerHiddenLayer.size());
     m_inputs.push_back(std::vector<double>(m_nbInputs));
 
     for(auto it = m_nbNeuronsPerHiddenLayer.begin(); it != m_nbNeuronsPerHiddenLayer.end(); ++it)
@@ -76,7 +77,7 @@ double ArtificialNeuralNetwork::computeOutputError()
             double t = m_targets[j];
             double delta = o*(1.0-o)*(t-o);
             m_layers.back()->deltaNeuron(j, delta);
-            totErr += abs(delta);
+            totErr += fabs(delta);
         }
     return totErr;
 }
@@ -96,7 +97,7 @@ double ArtificialNeuralNetwork::computeHiddenError()
             double h = m_layers[i-1]->outputNeuron(j);
             double delta = h*(1.0-h)*sum;
             m_layers[i-1]->deltaNeuron(j, delta);
-            totErrHiddenLayer += abs(delta);
+            totErrHiddenLayer += fabs(delta);
         }
         totErrAllHiddenLayer += totErrHiddenLayer;
     }
@@ -107,8 +108,15 @@ void ArtificialNeuralNetwork::adjustWeights()
 {
     for(size_t i = 0; i < m_layers.size(); ++i)
         for(auto& neuron : m_layers[i]->neurons())
+        {
             for(size_t j = 0; j < m_inputs[i].size(); ++j)
-                neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevWeight(j));
+            {
+                double delta = neuron->delta();
+                double prevWeight = neuron->prevWeight(j);
+                neuron->updateWeight(j, m_learningRate*delta*m_inputs[i][j] + m_momentum*prevWeight);
+            }
+            neuron->updateThreshold(m_learningRate*neuron->delta() + m_momentum*neuron->prevThreshold());
+        }
 }
 
 std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const
