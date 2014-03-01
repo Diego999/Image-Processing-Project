@@ -11,7 +11,7 @@ public:
 
     double computeOutput(const std::vector<double>& inputs);
 
-    void updateWeight(int i, double v) {m_prevWeights[i+1] = m_weights[i+1]; m_weights[i+1] += v;}
+    void updateWeight(int i, double v) {m_prevWeights[i+1] = v; m_weights[i+1] += v;}
     void updateThreshold(double v) {m_prevWeights[0] = m_weights[0]; m_weights[0] += v;}
 
     void loadNewWeights(const std::vector<double>& inputs);
