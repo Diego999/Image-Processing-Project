@@ -29,7 +29,7 @@ double Neuron::computeOutput(const std::vector<double>& inputs)
     double sum = 0.0;
     for(size_t i = 0; i < inputs.size(); ++i)
         sum += m_weights[i+1]*inputs[i]; // i+1 -> avoid threshold
-    sum -= m_weights[0]; //xi = 1.0
+    //sum -= m_weights[0]; //xi = 1.0
 
     m_output = squashingFunction(sum);
     return m_output;

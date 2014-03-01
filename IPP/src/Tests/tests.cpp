@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
+#include <cmath>
 
 struct TestSet{
     std::string op;
@@ -16,35 +17,38 @@ void testsANN()
 {
     std::vector<TestSet> testSets;
 
-    /*testSets.push_back(TestSet{"AND",0,0,0.1});
+    testSets.push_back(TestSet{"AND",0,0,0.1});
     testSets.push_back(TestSet{"AND",0,1,0.1});
     testSets.push_back(TestSet{"AND",1,0,0.1});
     testSets.push_back(TestSet{"AND",1,1,0.9});
 
-    testSets.push_back(TestSet{"NAND",0,0,1});
-    testSets.push_back(TestSet{"NAND",0,1,1});
-    testSets.push_back(TestSet{"NAND",1,0,1});
-    testSets.push_back(TestSet{"NAND",1,1,0});
+    testSets.push_back(TestSet{"NAND",0,0,0.9});
+    testSets.push_back(TestSet{"NAND",0,1,0.9});
+    testSets.push_back(TestSet{"NAND",1,0,0.9});
+    testSets.push_back(TestSet{"NAND",1,1,0.1});
 
-    testSets.push_back(TestSet{"OR",0,0,0});
-    testSets.push_back(TestSet{"OR",0,1,1});
-    testSets.push_back(TestSet{"OR",1,0,1});
-    testSets.push_back(TestSet{"OR",1,1,1});
+    testSets.push_back(TestSet{"OR",0,0,0.1});
+    testSets.push_back(TestSet{"OR",0,1,0.9});
+    testSets.push_back(TestSet{"OR",1,0,0.9});
+    testSets.push_back(TestSet{"OR",1,1,.09});
 
-    testSets.push_back(TestSet{"NOR",0,0,1});
-    testSets.push_back(TestSet{"NOR",0,1,0});
-    testSets.push_back(TestSet{"NOR",1,0,0});
-    testSets.push_back(TestSet{"NOR",1,1,0});*/
+    testSets.push_back(TestSet{"NOR",0,0,0.9});
+    testSets.push_back(TestSet{"NOR",0,1,0.1});
+    testSets.push_back(TestSet{"NOR",1,0,0.1});
+    testSets.push_back(TestSet{"NOR",1,1,0.1});
 
     testSets.push_back(TestSet{"XOR",0,0,0.1});
     testSets.push_back(TestSet{"XOR",0,1,0.9});
     testSets.push_back(TestSet{"XOR",1,0,0.9});
     testSets.push_back(TestSet{"XOR",1,1,0.1});
-/*
-    testSets.push_back(TestSet{"NXOR",0,0,1});
-    testSets.push_back(TestSet{"NXOR",0,1,0});
-    testSets.push_back(TestSet{"NXOR",1,0,0});
-    testSets.push_back(TestSet{"NXOR",1,1,1});*/
+
+    testSets.push_back(TestSet{"NXOR",0,0,0.9});
+    testSets.push_back(TestSet{"NXOR",0,1,0.1});
+    testSets.push_back(TestSet{"NXOR",1,0,0.1});
+    testSets.push_back(TestSet{"NXOR",1,1,0.9});
+
+    std::cout.precision(2);
+    std::cout << std::fixed;
 
     for(size_t i = 0; i < testSets.size(); i+=4)
     {
@@ -60,13 +64,15 @@ void testsANN()
                 TestSet ts = testSets[i+j%4];
                 err += ann.train({ts.input1, ts.input2}, {ts.target});
             }
-            std::cout << err << std::endl;
         }while(err >= 0.01);
 
         for(j = i; j < i+4; ++j)
         {
             TestSet ts = testSets[j];
-            std::cout << ts.input1 << " " << ts.op << " " << ts.input2 << " -> " << ann.feedForward({ts.input1, ts.input2})[0] << " (" << ts.target << ")" << std::endl;
+            double out = ann.feedForward({ts.input1, ts.input2})[0];
+            std::cout << ts.input1 << " " << ts.op << " " << ts.input2 << " -> " << out << " (" << ts.target << ")" << std::endl;
+            assert(fabs(out-ts.target) < 0.05);
         }
+        std::cout << std::endl;
     }
 }
