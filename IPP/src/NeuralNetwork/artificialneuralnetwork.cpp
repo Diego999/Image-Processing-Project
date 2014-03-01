@@ -9,7 +9,7 @@
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers,  const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbHiddenLayers), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
-    assert(nbHiddenLayers == nbNeuronsPerHiddenLayer.size());
+    assert(static_cast<size_t>(nbHiddenLayers) == nbNeuronsPerHiddenLayer.size());
     m_inputs.push_back(std::vector<double>(m_nbInputs));
 
     for(auto it = m_nbNeuronsPerHiddenLayer.begin(); it != m_nbNeuronsPerHiddenLayer.end(); ++it)

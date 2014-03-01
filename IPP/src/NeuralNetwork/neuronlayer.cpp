@@ -1,10 +1,13 @@
 #include "include/NeuralNetwork/neuronlayer.h"
 #include "include/NeuralNetwork/neuron.h"
 
-NeuronLayer::NeuronLayer(int nbNeurons, int nbInputs):m_nbNeurons(nbNeurons)
+#include <cassert>
+
+NeuronLayer::NeuronLayer(int nbNeurons, int nbInputs):m_nbNeurons(nbNeurons), m_neurons(nbNeurons)
 {
+    assert(nbNeurons > 0);
     for(int i = 0; i < m_nbNeurons; ++i)
-        m_neurons.push_back(std::shared_ptr<Neuron>(new Neuron(nbInputs)));
+        m_neurons[i] = std::shared_ptr<Neuron>(new Neuron(nbInputs));
 }
 
 NeuronLayer::~NeuronLayer()
@@ -17,6 +20,31 @@ void NeuronLayer::updateWeightNeuron(int neuron, int i, double v)
     return m_neurons[neuron]->updateWeight(i, v);
 }
 
+void NeuronLayer::weightNeuron(int neuron, int i, double v)
+{
+    m_neurons[neuron]->weight(i, v);
+}
+
+void NeuronLayer::prevWeightNeuron(int neuron, int i, double v)
+{
+    m_neurons[neuron]->prevWeight(i, v);
+}
+
+void NeuronLayer::deltaNeuron(int neuron, double d)
+{
+    m_neurons[neuron]->delta(d);
+}
+
+void NeuronLayer::threshold(int neuron, double v)
+{
+    m_neurons[neuron]->threshold(v);
+}
+
+void NeuronLayer::prevThreshold(int neuron, double v)
+{
+    m_neurons[neuron]->prevThreshold(v);
+}
+
 double NeuronLayer::outputNeuron(int neuron) const
 {
     return m_neurons[neuron]->output();
@@ -27,9 +55,9 @@ double NeuronLayer::weightNeuron(int neuron, int i) const
     return m_neurons[neuron]->weight(i);
 }
 
-void NeuronLayer::weightNeuron(int neuron, int i, double v)
+double NeuronLayer::deltaNeuron(int neuron) const
 {
-    m_neurons[neuron]->weight(i, v);
+    return m_neurons[neuron]->delta();
 }
 
 double NeuronLayer::prevWeightNeuron(int neuron, int i) const
@@ -37,17 +65,12 @@ double NeuronLayer::prevWeightNeuron(int neuron, int i) const
     return m_neurons[neuron]->prevWeight(i);
 }
 
-void NeuronLayer::prevWeightNeuron(int neuron, int i, double v)
+double NeuronLayer::threshold(int neuron) const
 {
-    m_neurons[neuron]->prevWeight(i, v);
+    return m_neurons[neuron]->threshold();
 }
 
-double NeuronLayer::deltaNeuron(int neuron) const
+double NeuronLayer::prevThreshold(int neuron) const
 {
-    return m_neurons[neuron]->delta();
-}
-
-void NeuronLayer::deltaNeuron(int neuron, double d)
-{
-    m_neurons[neuron]->delta(d);
+    return m_neurons[neuron]->prevThreshold();
 }
