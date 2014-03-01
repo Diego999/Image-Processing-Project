@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 const double Neuron::MAXIMUM_WEIGHT = 1.0;
 const double Neuron::MINIMUM_WEIGHT = -1.0;

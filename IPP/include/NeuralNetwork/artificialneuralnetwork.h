@@ -10,7 +10,7 @@ class ArtificialNeuralNetwork
 {
 public:
     //The inputs is not consider as a layer !
-    ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum);
+    ArtificialNeuralNetwork(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum);
 
     ~ArtificialNeuralNetwork();
 

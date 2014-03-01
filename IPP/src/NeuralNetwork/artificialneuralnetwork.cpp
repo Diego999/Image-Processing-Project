@@ -6,10 +6,9 @@
 #include <cassert>
 #include <iostream>
 
-ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, int nbHiddenLayers,  const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
-    :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbHiddenLayers), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
+ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
+    :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbNeuronsPerHiddenLayer.size()), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
-    assert(static_cast<size_t>(nbHiddenLayers) == nbNeuronsPerHiddenLayer.size());
     m_inputs.push_back(std::vector<double>(m_nbInputs));
 
     for(auto it = m_nbNeuronsPerHiddenLayer.begin(); it != m_nbNeuronsPerHiddenLayer.end(); ++it)
@@ -62,10 +61,7 @@ void ArtificialNeuralNetwork::layerForward()
 {
     for(size_t i = 0; i < m_layers.size(); ++i)
         for(size_t j = 0; j < m_layers[i]->size(); ++j)
-        {
-            double output = m_layers[i]->neuron(j)->computeOutput(m_inputs[i]);
-            m_inputs[i+1][j] = output;
-        }
+            m_inputs[i+1][j] = m_layers[i]->neuron(j)->computeOutput(m_inputs[i]);
 }
 
 double ArtificialNeuralNetwork::computeOutputError()
@@ -112,10 +108,7 @@ void ArtificialNeuralNetwork::adjustWeights()
         {
             for(size_t j = 0; j < m_inputs[i].size(); ++j)
             {
-                double delta = neuron->delta();
-                double prevWeight = neuron->prevWeight(j);
-                //std::cout << (m_learningRate*delta*m_inputs[i][j] + m_momentum*prevWeight) << std::endl;
-                neuron->updateWeight(j, m_learningRate*delta*m_inputs[i][j] + m_momentum*prevWeight);
+                neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevWeight(j));
             }
             neuron->updateThreshold(m_learningRate*neuron->delta() + m_momentum*neuron->prevThreshold());
         }
