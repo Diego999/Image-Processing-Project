@@ -64,13 +64,13 @@ void testsANN()
                 TestSet ts = testSets[i+j%4];
                 err += ann.train({ts.input1, ts.input2}, {ts.target});
             }
-        }while(err >= 0.01);
+        }while(err >= 0.001);
 
         for(j = i; j < i+4; ++j)
         {
             TestSet ts = testSets[j];
             double out = ann.feedForward({ts.input1, ts.input2})[0];
-            std::cout << ts.input1 << " " << ts.op << " " << ts.input2 << " -> " << out << " (" << ts.target << ")" << std::endl;
+            std::cout << static_cast<int>(ts.input1) << " " << ts.op << " " << static_cast<int>(ts.input2) << " -> " << out << " (" << ts.target << ")" << std::endl;
             assert(fabs(out-ts.target) < 0.4);
         }
         std::cout << std::endl;

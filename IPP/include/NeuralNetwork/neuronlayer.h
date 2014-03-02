@@ -14,19 +14,17 @@ public:
     int nbNeurons() const {return m_nbNeurons;}
     const std::vector<std::shared_ptr<Neuron>>& neurons() const {return m_neurons;}
     size_t size() const {return m_neurons.size();}
+
+    void updateWeightNeuron(int neuron, int i, double v);
+
     double weightNeuron(int neuron, int i) const;
     double threshold(int neuron) const;
-    double prevThreshold(int neuron) const;
-    double prevWeightNeuron(int neuron, int i) const;
     double deltaNeuron(int neuron) const;
     double outputNeuron(int neuron) const;
 
     void weightNeuron(int neuron, int i, double v);
-    void prevWeightNeuron(int neuron, int i, double v);
     void deltaNeuron(int neuron, double d);
-    void updateWeightNeuron(int neuron, int i, double v);
     void threshold(int neuron, double v);
-    void prevThreshold(int neuron, double v);
 
     const std::shared_ptr<Neuron>& neuron(int i) const {return m_neurons[i];}
     std::shared_ptr<Neuron>& operator[](int i)  {return m_neurons[i];}

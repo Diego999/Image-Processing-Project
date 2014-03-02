@@ -25,11 +25,6 @@ void NeuronLayer::weightNeuron(int neuron, int i, double v)
     m_neurons[neuron]->weight(i, v);
 }
 
-void NeuronLayer::prevWeightNeuron(int neuron, int i, double v)
-{
-    m_neurons[neuron]->prevDeltaWeight(i, v);
-}
-
 void NeuronLayer::deltaNeuron(int neuron, double d)
 {
     m_neurons[neuron]->delta(d);
@@ -38,11 +33,6 @@ void NeuronLayer::deltaNeuron(int neuron, double d)
 void NeuronLayer::threshold(int neuron, double v)
 {
     m_neurons[neuron]->threshold(v);
-}
-
-void NeuronLayer::prevThreshold(int neuron, double v)
-{
-    m_neurons[neuron]->prevDeltaThreshold(v);
 }
 
 double NeuronLayer::outputNeuron(int neuron) const
@@ -60,17 +50,7 @@ double NeuronLayer::deltaNeuron(int neuron) const
     return m_neurons[neuron]->delta();
 }
 
-double NeuronLayer::prevWeightNeuron(int neuron, int i) const
-{
-    return m_neurons[neuron]->prevDeltaWeight(i);
-}
-
 double NeuronLayer::threshold(int neuron) const
 {
     return m_neurons[neuron]->threshold();
-}
-
-double NeuronLayer::prevThreshold(int neuron) const
-{
-    return m_neurons[neuron]->prevDeltaThreshold();
 }

@@ -39,31 +39,22 @@ ArtificialNeuralNetwork::~ArtificialNeuralNetwork()
 
 const std::vector<double>& ArtificialNeuralNetwork::feedForward(const std::vector<double>& dataInputs)
 {
-    inputs(dataInputs);
-    return feedForward();
+    m_inputs[0] = dataInputs;
+    layerForward();
+    return m_inputs.back();
 }
 
 double ArtificialNeuralNetwork::train(const std::vector<double>& dataInputs, const std::vector<double>& dataTargets)
 {
-    inputs(dataInputs);
-    targets(dataTargets);
-    return train();
-}
+    m_inputs[0] = dataInputs;
+    m_targets = dataTargets;
 
-double ArtificialNeuralNetwork::train()
-{
     layerForward();
     double errorTot = 0;
     errorTot += computeOutputError();
     errorTot += computeHiddenError();
     adjustWeights();
     return errorTot;
-}
-
-const std::vector<double>& ArtificialNeuralNetwork::feedForward()
-{
-    layerForward();
-    return outputs();
 }
 
 void ArtificialNeuralNetwork::layerForward()
@@ -92,8 +83,6 @@ double ArtificialNeuralNetwork::computeHiddenError()
 {
     double totErrAllHiddenLayer = 0.0;
     for(size_t i = m_layers.size()-1; i > 0 ; --i)
-    {
-        double totErrHiddenLayer = 0.0;
         for(size_t j = 0; j < m_layers[i-1]->size(); ++j)
         {
             double sum = 0.0;
@@ -103,10 +92,8 @@ double ArtificialNeuralNetwork::computeHiddenError()
             double h = m_layers[i-1]->outputNeuron(j);
             double delta = h*(1.0-h)*sum;
             m_layers[i-1]->deltaNeuron(j, delta);
-            totErrHiddenLayer += fabs(delta);
+            totErrAllHiddenLayer += fabs(delta);
         }
-        totErrAllHiddenLayer += totErrHiddenLayer;
-    }
     return totErrAllHiddenLayer;
 }
 
@@ -124,22 +111,4 @@ void ArtificialNeuralNetwork::adjustWeights()
 std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const
 {
     return m_layers[numLayer]->neuron(numNeuron)->weights();
-}
-
-void ArtificialNeuralNetwork::inputs(const std::vector<double>& dataInputs)
-{
-    assert(dataInputs.size() == static_cast<size_t>(m_nbInputs));
-
-    m_inputs[0].clear();
-    for(auto& val : dataInputs)
-        m_inputs[0].push_back(val);
-}
-
-void ArtificialNeuralNetwork::targets(const std::vector<double>& dataTargets)
-{
-    assert(dataTargets.size() == static_cast<size_t>(m_nbOutputs));
-
-    m_targets.clear();
-    for(auto& val : dataTargets)
-        m_targets.push_back(val);
 }

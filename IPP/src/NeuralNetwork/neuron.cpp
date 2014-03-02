@@ -49,27 +49,3 @@ void Neuron::initializePrevDeltaWeights()
     for(size_t i = 0; i < m_weights.size(); ++i)
         m_prevDeltaWeights.push_back(0);
 }
-
-void Neuron::changeWeights(const std::vector<double>& newWeights)
-{
-    assert(m_weights.size()-1 == newWeights.size());
-
-    m_prevDeltaWeights[0] = m_weights[0];
-    for(size_t i = 1; i < m_weights.size(); ++i)
-    {
-        m_prevDeltaWeights[i] = m_weights[i];
-        m_weights[i] = newWeights[i-1];
-    }
-}
-
-void Neuron::loadNewWeights(const std::vector<double>& inputs)
-{
-    m_nbInputs = inputs.size()-1;
-    m_delta = m_output = 0;
-
-    m_weights.clear();
-    for(auto& val : inputs)
-        m_weights.push_back(val);
-
-    initializePrevDeltaWeights();
-}

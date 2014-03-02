@@ -14,14 +14,11 @@ public:
     void updateWeight(int i, double v) {m_prevDeltaWeights[i+1] = v; m_weights[i+1] += v;}
     void updateThreshold(double v) {m_prevDeltaWeights[0] = m_weights[0]; m_weights[0] += v;}
 
-    void loadNewWeights(const std::vector<double>& inputs);
-    void changeWeights(const std::vector<double>& newWeights); //Transfer weights[i] -> oldWeights[i]
-
     std::vector<double> weights() const {return std::vector<double>(m_weights.begin()+1, m_weights.end());}
-    std::vector<double> prevDeltaWeights() const {return std::vector<double>(m_prevDeltaWeights.begin()+1, m_prevDeltaWeights.end());}
     size_t size() const {return m_weights.size()-1;}
     int inputNb() const {return m_nbInputs;}
     double output() const {return m_output;}
+
     double threshold() const {return m_weights[0];}
     double weight(int i) const {return m_weights[i+1];}
     double prevDeltaWeight(int i) const {return m_prevDeltaWeights[i+1];}
@@ -30,12 +27,7 @@ public:
 
     void threshold(double t) {m_weights[0]=t;}
     void weight(int i, double v) {m_weights[i+1] = v;}
-    void prevDeltaWeight(int i, double v) {m_prevDeltaWeights[i+1] = v;}
-    void prevDeltaThreshold(double v) {m_prevDeltaWeights[0] = v;}
     void delta(double d) {m_delta=d;}
-
-    const double& operator[](int i) const {return m_weights[i+1];}
-    double& operator[](int i) {return m_weights[i+1];}
 
 private:
     static const double MINIMUM_WEIGHT;
