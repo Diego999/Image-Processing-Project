@@ -9,14 +9,20 @@
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbNeuronsPerHiddenLayer.size()), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
+    //First hidden layer
+    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(*m_nbNeuronsPerHiddenLayer.begin(), m_nbInputs)));
     m_inputs.push_back(std::vector<double>(m_nbInputs));
 
-    for(auto it = m_nbNeuronsPerHiddenLayer.begin(); it != m_nbNeuronsPerHiddenLayer.end(); ++it)
+    for(auto it = m_nbNeuronsPerHiddenLayer.begin()+1; it != m_nbNeuronsPerHiddenLayer.end(); ++it)
     {
-        m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(*it, m_nbInputs)));
-        m_inputs.push_back(std::vector<double>(*it, 0));
+        m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(*it, *(it-1))));
+        m_inputs.push_back(std::vector<double>(*(it-1), 0));
     }
-    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbOutputs, *(m_nbNeuronsPerHiddenLayer.end()-1)))); // Output is considered as a layer, contrary to the inputs
+
+    m_inputs.push_back(std::vector<double>(*(m_nbNeuronsPerHiddenLayer.end()-1), 0));
+
+    // Output layer. Output is considered as a layer, contrary to the inputs
+    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbOutputs, *(m_nbNeuronsPerHiddenLayer.end()-1))));
     m_inputs.push_back(std::vector<double>(m_nbOutputs, 0)); //To simplify the feedforward, the output of the ith-1 layer are the inputs of the ith layer. For the last layer (outputs), it is only outputs
 
     for(int i = 0; i < m_nbOutputs; ++i)
@@ -106,7 +112,10 @@ void ArtificialNeuralNetwork::adjustWeights()
     for(size_t i = 0; i < m_layers.size(); ++i)
         for(auto& neuron : m_layers[i]->neurons())
             for(size_t j = 0; j < m_inputs[i].size(); ++j)
+            {
+                //std::cout << m_inputs[i][j] << std::endl;
                 neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevWeight(j));
+            }
 }
 
 std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const
