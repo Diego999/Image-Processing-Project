@@ -52,7 +52,7 @@ void testsANN()
 
     for(size_t i = 0; i < testSets.size(); i+=4)
     {
-        ArtificialNeuralNetwork ann(2, 1, {3,2}, 0.3, 0.3);
+        ArtificialNeuralNetwork ann(2, 1, {30,20,10}, 0.3, 0.3);
         double err = 0;
         size_t j = 0;
         do

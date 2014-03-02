@@ -112,10 +112,7 @@ void ArtificialNeuralNetwork::adjustWeights()
     for(size_t i = 0; i < m_layers.size(); ++i)
         for(auto& neuron : m_layers[i]->neurons())
             for(size_t j = 0; j < m_inputs[i].size(); ++j)
-            {
-                //std::cout << m_inputs[i][j] << std::endl;
-                neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevWeight(j));
-            }
+                neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevDeltaWeight(j));
 }
 
 std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const

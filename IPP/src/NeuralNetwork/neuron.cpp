@@ -13,11 +13,11 @@ double Neuron::squashingFunction(double x)
     return 1.0/(1.0+exp(-x));
 }
 
-Neuron::Neuron(int nbInputs):m_nbInputs(nbInputs), m_delta(0), m_output(0), m_weights(nbInputs+1), m_prevWeights(nbInputs+1)
+Neuron::Neuron(int nbInputs):m_nbInputs(nbInputs), m_delta(0), m_output(0), m_weights(nbInputs+1), m_prevDeltaWeights(nbInputs+1)
 {
     assert(nbInputs > 0);
     initializeWeights();
-    initializePrevWeights();
+    initializePrevDeltaWeights();
 }
 
 Neuron::~Neuron()
@@ -43,21 +43,21 @@ void Neuron::initializeWeights()
         m_weights.push_back(val);
 }
 
-void Neuron::initializePrevWeights()
+void Neuron::initializePrevDeltaWeights()
 {
-    m_prevWeights.clear();
+    m_prevDeltaWeights.clear();
     for(size_t i = 0; i < m_weights.size(); ++i)
-        m_prevWeights.push_back(0);
+        m_prevDeltaWeights.push_back(0);
 }
 
 void Neuron::changeWeights(const std::vector<double>& newWeights)
 {
     assert(m_weights.size()-1 == newWeights.size());
 
-    m_prevWeights[0] = m_weights[0];
+    m_prevDeltaWeights[0] = m_weights[0];
     for(size_t i = 1; i < m_weights.size(); ++i)
     {
-        m_prevWeights[i] = m_weights[i];
+        m_prevDeltaWeights[i] = m_weights[i];
         m_weights[i] = newWeights[i-1];
     }
 }
@@ -71,5 +71,5 @@ void Neuron::loadNewWeights(const std::vector<double>& inputs)
     for(auto& val : inputs)
         m_weights.push_back(val);
 
-    initializePrevWeights();
+    initializePrevDeltaWeights();
 }
