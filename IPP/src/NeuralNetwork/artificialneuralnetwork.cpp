@@ -9,6 +9,9 @@
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
     :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbNeuronsPerHiddenLayer.size()), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
+    // We don't treat the case of single perceptron.
+    assert(nbNeuronsPerHiddenLayer.size() > 0);
+
     //First hidden layer
     m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(*m_nbNeuronsPerHiddenLayer.begin(), m_nbInputs)));
     m_inputs.push_back(std::vector<double>(m_nbInputs));
@@ -111,8 +114,11 @@ void ArtificialNeuralNetwork::adjustWeights()
 {
     for(size_t i = 0; i < m_layers.size(); ++i)
         for(auto& neuron : m_layers[i]->neurons())
+        {
             for(size_t j = 0; j < m_inputs[i].size(); ++j)
                 neuron->updateWeight(j, m_learningRate*neuron->delta()*m_inputs[i][j] + m_momentum*neuron->prevDeltaWeight(j));
+            neuron->updateThreshold(m_learningRate*neuron->delta() + m_momentum*neuron->prevDeltaThreshold());
+        }
 }
 
 std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const
