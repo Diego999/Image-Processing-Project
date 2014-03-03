@@ -12,7 +12,7 @@ public:
     double computeOutput(const std::vector<double>& inputs);
 
     void updateWeight(int i, double v) {m_prevDeltaWeights[i+1] = v; m_weights[i+1] += v;}
-    void updateThreshold(double v) {m_prevDeltaWeights[0] = m_weights[0]; m_weights[0] += v;}
+    void updateThreshold(double v) {m_prevDeltaWeights[0] = v; m_weights[0] += v;}
 
     std::vector<double> weights() const {return std::vector<double>(m_weights.begin()+1, m_weights.end());}
     size_t size() const {return m_weights.size()-1;}
