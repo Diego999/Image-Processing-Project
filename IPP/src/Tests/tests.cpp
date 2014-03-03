@@ -47,14 +47,13 @@ void testsANN()
     testSets.push_back(TestSet{"NXOR",1,0,0.1});
     testSets.push_back(TestSet{"NXOR",1,1,0.9});
 
-    std::cout.precision(2);
-    std::cout << std::fixed;
-
+    int k = 0;
     for(size_t i = 0; i < testSets.size(); i+=4)
     {
-        ArtificialNeuralNetwork ann(2, 1, {30,20,10}, 0.3, 0);
+        ArtificialNeuralNetwork ann(2, 1, {3}, 0.1, 0.1);
         double err = 0;
         size_t j = 0;
+        k=0;
         do
         {
             j = 0;
@@ -64,6 +63,7 @@ void testsANN()
                 TestSet ts = testSets[i+j%4];
                 err += ann.train({ts.input1, ts.input2}, {ts.target});
             }
+            ++k;
         }while(err >= 0.001);
 
         for(j = i; j < i+4; ++j)
@@ -73,6 +73,6 @@ void testsANN()
             std::cout << static_cast<int>(ts.input1) << " " << ts.op << " " << static_cast<int>(ts.input2) << " -> " << out << " (" << ts.target << ")" << std::endl;
             assert(fabs(out-ts.target) < 0.4);
         }
-        std::cout << std::endl;
+        std::cout << "Error : " << err << std::endl << "iterations " << k << std::endl << std::endl;
     }
 }
