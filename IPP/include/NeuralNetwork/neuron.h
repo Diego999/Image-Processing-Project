@@ -2,6 +2,7 @@
 #define NEURON_H
 
 #include <vector>
+#include <stdlib.h>
 
 class Neuron
 {

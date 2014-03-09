@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <initializer_list>
+#include <memory>
 
 class NeuronLayer;
 
@@ -24,7 +25,13 @@ public:
     int nbHiddenLayers() const {return m_nbHiddenLayers;}
     const std::vector<int>& nbNeuronsPerHiddenLayer() const {return m_nbNeuronsPerHiddenLayer;}
 
+    double threshold(int numLayer, int numNeuron) const;
+    double deltaNeuron(int numLayer, int numNeuron) const;
     std::vector<double> weights(int numLayer, int numNeuron) const;
+
+    void threshold(int numLayer, int numNeuron, double threshold);
+    void deltaNeuron(int numLayer, int numNeuron, double deltaNeuron);
+    void weights(int numLayer, int numNeuron, int i, double weights);
 
 private:
     void layerForward();

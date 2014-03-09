@@ -108,7 +108,31 @@ void ArtificialNeuralNetwork::adjustWeights()
         }
 }
 
+double ArtificialNeuralNetwork::threshold(int numLayer, int numNeuron) const
+{
+    return m_layers[numLayer]->threshold(numNeuron);
+}
+
+double ArtificialNeuralNetwork::deltaNeuron(int numLayer, int numNeuron) const
+{
+    return m_layers[numLayer]->deltaNeuron(numNeuron);
+}
+
 std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron) const
 {
     return m_layers[numLayer]->neuron(numNeuron)->weights();
+}
+
+void ArtificialNeuralNetwork::threshold(int numLayer, int numNeuron, double value)
+{
+    m_layers[numLayer]->neuron(numNeuron)->threshold(value);
+}
+
+void ArtificialNeuralNetwork::deltaNeuron(int numLayer, int numNeuron, double value)
+{
+    m_layers[numLayer]->neuron(numNeuron)->delta(value);
+}
+void ArtificialNeuralNetwork::weights(int numLayer, int numNeuron, int i, double value)
+{
+    m_layers[numLayer]->neuron(numNeuron)->weight(i, value);
 }
