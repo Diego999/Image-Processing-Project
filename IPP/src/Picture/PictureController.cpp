@@ -1,10 +1,10 @@
 #include "include/Picture/PictureController.h"
 
+#include <map>
+
 #include <QString>
 #include <QImage>
 #include <QColor>
-#include <iostream>
-#include <QDebug>
 
 std::vector<std::vector<double>> PictureController::loadPictures(const std::vector<std::string>& filepaths)
 {
@@ -35,7 +35,65 @@ QImage PictureController::create(const std::vector<double>& values, int width)
     return picture;
 }
 
-std::vector<double> PictureController::otsuSegmentation(const std::vector<double>& picture)
+QImage PictureController::createThresholded(const std::vector<double>& values, int width)
 {
+    return create(otsuSegmentation(values), width);
+}
 
+std::vector<double> PictureController::otsuSegmentation(const std::vector<double>& originalPicture)
+{
+    std::vector<double> picture(originalPicture);
+    int min = static_cast<int>(*std::min_element(picture.cbegin(), picture.cend()));
+    int max = static_cast<int>(*std::max_element(picture.cbegin(), picture.cend()));
+
+    std::map<int, double> histogram;
+    for(int i = min; i <= max; ++i)
+        histogram[i] = 0.0;
+
+    for(auto& v : picture)
+        ++histogram[static_cast<int>(v)];
+    for(std::pair<int, double> v : histogram)
+        histogram[v.first] /= picture.size();
+
+    std::vector<std::pair<int, double>> ow;
+    for(int t = min+1; t < max; ++t)
+    {
+        double p1, p2, m1, m2;
+        p1 = p2 = m1 = m2 = 0;
+        int i = min;
+        for(auto& v : histogram)
+            if(i++ < t)
+            {
+                p1 += v.second;
+                m1 += v.first*v.second;
+            }
+            else
+            {
+                p2 += v.second;
+                m2 += v.first*v.second;
+            }
+        m1 /= p1; m2 /= p2;
+
+        double s1 = 0, s2 = 0;
+        i = min;
+        for(auto& v : histogram)
+            if(i++ < t)
+                s1 += v.second*variance(i-1, m1);
+            else
+                s2 += v.second*variance(i-1, m2);
+        s1 /= p1; s2 /= p2;
+
+        ow.push_back(std::pair<int, double>(t, p1*s1+p2*s2));
+    }
+
+    std::sort(ow.begin(), ow.end(),
+              [](std::pair<int,double> const & a, std::pair<int,double> const & b)
+            {
+                 return a.second != b.second?  a.second < b.second : a.first < b.first;
+            });
+
+    for(auto& v : picture)
+        v = v <= ow[0].first ? 0 : 1;
+
+    return picture;
 }
