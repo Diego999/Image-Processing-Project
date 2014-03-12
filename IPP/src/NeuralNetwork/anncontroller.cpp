@@ -81,10 +81,10 @@ const std::vector<double>&  ANNController::feedForward(const std::vector<double>
 
 const std::vector<std::vector<double>>&  ANNController::feedForward(const std::vector<std::vector<double>>& dataInputs)
 {
-    std::vector<std::vector<double>>* results = new std::vector<std::vector<double>>();
-    for(size_t i = 0; i < dataInputs.size(); ++i)
-        results->push_back(m_ann->feedForward(dataInputs[i]));
-    return *results;
+                                      std::vector<std::vector<double>>* results = new std::vector<std::vector<double>>();
+                                      for(size_t i = 0; i < dataInputs.size(); ++i)
+results->push_back(m_ann->feedForward(dataInputs[i]));
+return *results;
 }
 
 std::vector<double> ANNController::weights(int numLayer, int numNeuron) const
@@ -99,13 +99,17 @@ void ANNController::exportANN(const std::string& filepath)
     for(auto& nbNeurons : m_ann->nbNeuronsPerHiddenLayer())
         file << nbNeurons << SPACE;
     file << m_ann->learningRate() << SPACE << m_ann->momentum() << SPACE;
-    for(int i = 0; i < m_ann->nbHiddenLayers(); ++i)
+    for(int i = 0; i < m_ann->nbHiddenLayers() + 1; ++i)
     {
-        for(int j = 0; j < m_ann->nbNeuronsPerHiddenLayer()[i]; ++j)
+        int nbNeurons = (i < m_ann->nbHiddenLayers()) ? m_ann->nbNeuronsPerHiddenLayer()[i] : m_ann->nbOutputs();
+        for(int j = 0; j < nbNeurons; ++j)
         {
             for(auto& weight : m_ann->weights(i,j))
                 file << weight << SPACE;
             file << m_ann->threshold(i, j) << SPACE << m_ann->deltaNeuron(i, j) << SPACE;
+            for(auto& prevWeight : m_ann->prevDeltaWeights(i,j))
+                file << prevWeight << SPACE;
+            file << m_ann->prevDeltaThreshold(i, j) << SPACE;
         }
     }
     file.close();
@@ -137,44 +141,79 @@ void ANNController::importANN(const std::string& filepath)
     fullIdx += idx;
     double momentum = std::stod(content.substr(fullIdx), &idx);
     fullIdx += idx;
+    createANN(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum);
 
-    std::vector<std::vector<std::tuple<std::vector<double>, double, double>>> neurons;
-    for(int i = 0; i < nbHiddenLayers; ++i)
+    for(int i = 0; i < nbHiddenLayers + 1; ++i)
     {
-        std::vector<std::tuple<std::vector<double>, double, double>> layer;
-        for(int j = 0; j < nbNeuronsPerHiddenLayer[i]; ++j)
+        int nbNeurons = (i < nbHiddenLayers) ? nbNeuronsPerHiddenLayer[i] : nbOutputs;
+        for(int j = 0; j < nbNeurons; ++j)
         {
             size_t nbNeuronsParent = (i > 0) ? nbNeuronsPerHiddenLayer[i-1] : nbInputs;
-            std::vector<double> weights;
             for(size_t k = 0; k < nbNeuronsParent; ++k)
             {
                 double weight = std::stod(content.substr(fullIdx), &idx);
                 fullIdx += idx;
-                weights.push_back(weight);
+                m_ann->weight(i, j, k, weight);
             }
             double threshold = std::stod(content.substr(fullIdx), &idx);
             fullIdx += idx;
+            m_ann->threshold(i, j, threshold);
             double deltaNeuron = std::stod(content.substr(fullIdx), &idx);
             fullIdx += idx;
-            std::tuple<std::vector<double>, double, double> neuron(weights, threshold, deltaNeuron);
-            layer.push_back(neuron);
+            m_ann->deltaNeuron(i, j, deltaNeuron);
+            for(size_t k = 0; k < nbNeuronsParent; ++k)
+            {
+                double prevDeltaWeight = std::stod(content.substr(fullIdx), &idx);
+                fullIdx += idx;
+                m_ann->prevDeltaWeight(i, j, k, prevDeltaWeight);
+            }
+            double prevDeltaThreshold = std::stod(content.substr(fullIdx), &idx);
+            fullIdx += idx;
+            m_ann->prevDeltaThreshold(i, j, prevDeltaThreshold);
         }
-        neurons.push_back(layer);
     }
-
-    createANN(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum);
-
-    for(size_t i = 0; i < neurons.size(); ++i)
-        for(size_t j = 0; j < neurons[i].size(); ++j)
-        {
-            for(size_t k = 0; k < std::get<0>(neurons[i][j]).size(); ++k)
-                m_ann->weights(i, j, k, std::get<0>(neurons[i][j])[k]);
-            m_ann->threshold(i, j, std::get<1>(neurons[i][j]));
-            m_ann->deltaNeuron(i, j, std::get<2>(neurons[i][j]));
-        }
 }
 
 void ANNController::createANN(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
 {
     m_ann = std::shared_ptr<ArtificialNeuralNetwork>(new ArtificialNeuralNetwork(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum));
+}
+
+std::string ANNController::log() const
+{
+    std::stringstream log;
+    log << "[START]" << std::endl;
+    log << "Nb inputs: " << m_ann->nbInputs() << std::endl;
+    log << "Nb outputs: " << m_ann->nbOutputs() << std::endl;
+    log << "Nb hidden layers: " << m_ann->nbHiddenLayers() << std::endl;
+    log << "Nb neurons per hidden layouts: {";
+    for(auto& nbNeurons : m_ann->nbNeuronsPerHiddenLayer())
+        log << nbNeurons << ", ";
+    log << "}" << std::endl;
+    log << "Learning rate: " << m_ann->learningRate() << std::endl;
+    log << "Momentum: " << m_ann->momentum() << std::endl;
+    for(int i = 0; i < m_ann->nbHiddenLayers() + 1; ++i)
+    {
+        int nbNeurons = (i < m_ann->nbHiddenLayers()) ? m_ann->nbNeuronsPerHiddenLayer()[i] : m_ann->nbOutputs();
+        for(int j = 0; j < nbNeurons; ++j)
+        {
+            log << "---------------------------------" << std::endl;
+            log << "Neuron " << j << " in layer " << i << ":" << std::endl;
+            log << "---------------------------------" << std::endl;
+            log << "Weights :";
+            for(auto& weight : m_ann->weights(i,j))
+                log << SPACE << weight;
+            log << std::endl;
+            log << "Threshold: " << m_ann->threshold(i, j) << std::endl;
+            log << "Delta: " << m_ann->deltaNeuron(i, j) << std::endl;
+            log << "Previous weights :";
+            for(auto& prevWeight : m_ann->prevDeltaWeights(i,j))
+                log << SPACE << prevWeight;
+            log << std::endl;
+            log << "Previous delta threshold: " << m_ann->prevDeltaThreshold(i, j) << std::endl;
+        }
+    }
+    log << "---------------------------------" << std::endl;
+    log << "[END]" << std::endl;
+    return log.str();
 }

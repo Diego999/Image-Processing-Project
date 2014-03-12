@@ -16,6 +16,7 @@ public:
     void updateThreshold(double v) {m_prevDeltaWeights[0] = v; m_weights[0] += v;}
 
     std::vector<double> weights() const {return std::vector<double>(m_weights.begin()+1, m_weights.end());}
+    std::vector<double> prevDeltaWeights() const {return std::vector<double>(m_prevDeltaWeights.begin()+1, m_prevDeltaWeights.end());}
     size_t size() const {return m_weights.size()-1;}
     int inputNb() const {return m_nbInputs;}
     double output() const {return m_output;}
@@ -28,6 +29,8 @@ public:
 
     void threshold(double t) {m_weights[0]=t;}
     void weight(int i, double v) {m_weights[i+1] = v;}
+    void prevDeltaWeight(int i, double v) { m_prevDeltaWeights[i+1] = v;}
+    void prevDeltaThreshold(double d) { m_prevDeltaWeights[0] = d;}
     void delta(double d) {m_delta=d;}
 
 private:

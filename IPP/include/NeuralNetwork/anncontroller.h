@@ -27,6 +27,8 @@ public:
 
     void error(double error) { m_error = error; }
 
+    std::string log() const;
+
 private:
     void importANN(const std::string& filepath);
     void createANN(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum);

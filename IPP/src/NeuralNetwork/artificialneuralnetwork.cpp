@@ -123,6 +123,26 @@ std::vector<double> ArtificialNeuralNetwork::weights(int numLayer, int numNeuron
     return m_layers[numLayer]->neuron(numNeuron)->weights();
 }
 
+std::vector<double> ArtificialNeuralNetwork::prevDeltaWeights(int numLayer, int numNeuron) const
+{
+    return m_layers[numLayer]->neuron(numNeuron)->prevDeltaWeights();
+}
+
+double ArtificialNeuralNetwork::weight(int numLayer, int numNeuron, int i) const
+{
+    return m_layers[numLayer]->neuron(numNeuron)->weight(i);
+}
+
+double ArtificialNeuralNetwork::prevDeltaWeight(int numLayer, int numNeuron,int i) const
+{
+    return m_layers[numLayer]->neuron(numNeuron)->prevDeltaWeight(i);
+}
+
+double ArtificialNeuralNetwork::prevDeltaThreshold(int numLayer, int numNeuron) const
+{
+    return m_layers[numLayer]->neuron(numNeuron)->prevDeltaThreshold();
+}
+
 void ArtificialNeuralNetwork::threshold(int numLayer, int numNeuron, double value)
 {
     m_layers[numLayer]->neuron(numNeuron)->threshold(value);
@@ -132,7 +152,17 @@ void ArtificialNeuralNetwork::deltaNeuron(int numLayer, int numNeuron, double va
 {
     m_layers[numLayer]->neuron(numNeuron)->delta(value);
 }
-void ArtificialNeuralNetwork::weights(int numLayer, int numNeuron, int i, double value)
+void ArtificialNeuralNetwork::weight(int numLayer, int numNeuron, int i, double weight)
 {
-    m_layers[numLayer]->neuron(numNeuron)->weight(i, value);
+    m_layers[numLayer]->neuron(numNeuron)->weight(i, weight);
+}
+
+void ArtificialNeuralNetwork::prevDeltaWeight(int numLayer, int numNeuron, int i, double v)
+{
+    return m_layers[numLayer]->neuron(numNeuron)->prevDeltaWeight(i, v);
+}
+
+void ArtificialNeuralNetwork::prevDeltaThreshold(int numLayer, int numNeuron, double d)
+{
+    return m_layers[numLayer]->neuron(numNeuron)->prevDeltaThreshold(d);
 }

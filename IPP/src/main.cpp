@@ -35,11 +35,13 @@ int main(int argc, char* argv[])
     annc->exportANN(filepath);
     for(auto& result : annc->feedForward(validationSets))
         std::cout << result[0] << std::endl;
-    /*
+
     ANNController* annc2 = new ANNController(filepath);
     for(auto& result : annc2->feedForward(validationSets))
-        std::cout << result[0] << std::endl;*/
+        std::cout << result[0] << std::endl;
 
+    std::cout << annc->log();
+    std::cout << annc2->log();
     //testsANN();
     /*
     QApplication app(argc, argv);
