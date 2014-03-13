@@ -32,7 +32,8 @@ SOURCES += src/main.cpp \
     src/NeuralNetwork/neuronlayer.cpp \
     src/Utils/settings.cpp \
     src/NeuralNetwork/artificialneuralnetwork.cpp \
-    src/Tests/tests.cpp
+    src/Tests/tests.cpp \
+    src/Picture/PictureController.cpp
 
 HEADERS += \
     include/Utils/utils.h \
@@ -40,4 +41,5 @@ HEADERS += \
     include/NeuralNetwork/neuronlayer.h \
     include/Utils/settings.h \
     include/NeuralNetwork/artificialneuralnetwork.h \
-    include/Tests/tests.h
+    include/Tests/tests.h \
+    include/Picture/PictureController.h
