@@ -6,7 +6,7 @@
 #include <QImage>
 #include <QColor>
 
-std::vector<std::vector<double>> PictureController::loadPictures(const std::vector<std::string>& filepaths)
+std::vector<std::vector<double>> PictureController::loadPictures(const std::vector<std::string>& filepaths, bool otsu)
 {
     std::vector<std::vector<double>> output;
 
@@ -18,13 +18,13 @@ std::vector<std::vector<double>> PictureController::loadPictures(const std::vect
         for(int i = 0; i < picture.height(); ++i)
             for(int j = 0; j < picture.width(); ++j)
                 data.push_back(QColor(picture.pixel(j, i)).red());
-        output.push_back(data);
+        output.push_back(otsu ? otsuSegmentation(data) : data);
     }
 
     return output;
 }
 
-QImage PictureController::create(const std::vector<double>& values, int width)
+QImage PictureController::create(const std::vector<double>& values, int width, bool otsu)
 {
     QImage picture(width, values.size()/width, QImage::Format_RGB888);
 
@@ -32,17 +32,11 @@ QImage PictureController::create(const std::vector<double>& values, int width)
     for(size_t i = 0; i < values.size(); ++i)
         picture.setPixel(i%picture.width(), i/picture.width(), qRgb(ratio*values[i], ratio*values[i], ratio*values[i]));
 
-    return picture;
+    return otsu ? otsuSegmentation(picture) : picture;
 }
 
-QImage PictureController::createThresholded(const std::vector<double>& values, int width)
+void PictureController::otsuSegmentation(std::vector<double> &picture)
 {
-    return create(otsuSegmentation(values), width);
-}
-
-std::vector<double> PictureController::otsuSegmentation(const std::vector<double>& originalPicture)
-{
-    std::vector<double> picture(originalPicture);
     int min = static_cast<int>(*std::min_element(picture.cbegin(), picture.cend()));
     int max = static_cast<int>(*std::max_element(picture.cbegin(), picture.cend()));
 
@@ -94,6 +88,4 @@ std::vector<double> PictureController::otsuSegmentation(const std::vector<double
 
     for(auto& v : picture)
         v = v <= ow[0].first ? 0 : 1;
-
-    return picture;
 }
