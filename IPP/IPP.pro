@@ -4,6 +4,8 @@ TARGET = Test
 TEMPLATE = app
 
 win32 {
+    include (D:\qwt-6.1.0\features\qwt.prf)
+
     INCLUDEPATH += D:\\opencv\\build-mingw\\install\\include
 
     LIBS += -LD:\\opencv\\build-mingw\\bin \
@@ -14,6 +16,8 @@ win32 {
 }
 
 macx {
+    include (/usr/local/qwt-6.1.0/features/qwt.prf)
+
     INCLUDEPATH += /usr/local/include
 
     LIBS += -L/usr/local/lib \
@@ -34,7 +38,11 @@ SOURCES += src/main.cpp \
     src/NeuralNetwork/artificialneuralnetwork.cpp \
     src/Tests/tests.cpp \
     src/Picture/PictureController.cpp \
-    src/NeuralNetwork/anncontroller.cpp
+    src/NeuralNetwork/anncontroller.cpp \
+    src/GUI/graphicsview.cpp \
+    src/GUI/graphicsscene.cpp \
+    src/GUI/pixmap.cpp \
+    src/GUI/anngraphics.cpp
 
 HEADERS += \
     include/Utils/utils.h \
@@ -43,5 +51,9 @@ HEADERS += \
     include/Utils/settings.h \
     include/NeuralNetwork/artificialneuralnetwork.h \
     include/Tests/tests.h \
-    include/Picture/PictureController.h
-    include/NeuralNetwork/anncontroller.h
+    include/Picture/PictureController.h \
+    include/NeuralNetwork/anncontroller.h \
+    include/GUI/graphicsview.h \
+    include/GUI/graphicsscene.h \
+    include/GUI/pixmap.h \
+    include/GUI/anngraphics.h
