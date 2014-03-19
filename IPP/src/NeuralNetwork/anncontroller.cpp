@@ -45,11 +45,12 @@ ANNController::ANNController(const std::string& filepath, const std::vector<std:
     m_testSet = testSet;
 }
 
-void ANNController::train(const std::function<void(double, double)> &callback)
+void ANNController::train(const std::function<void(long, double, double)> &callback)
 {
     const size_t trainingQuantity = m_trainingSet.size();
     const size_t testQuantity = m_testSet.size();
     size_t j;
+    long iteration = 0L;
     double totalCurrentErrorTraining;
     double totalCurrentErrorTest;
     do
@@ -70,7 +71,8 @@ void ANNController::train(const std::function<void(double, double)> &callback)
             totalCurrentErrorTest += m_ann->train(test.first, test.second);
         }
 
-        callback(totalCurrentErrorTraining, totalCurrentErrorTest);
+        callback(iteration, totalCurrentErrorTraining, totalCurrentErrorTest);
+        iteration++;
     } while(totalCurrentErrorTraining >= m_error);
 }
 

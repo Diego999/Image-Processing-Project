@@ -90,9 +90,9 @@ void testsANNController()
     ANNController* annc = new ANNController(2, 1, {3}, 0.5, 0.5,testSets, testSets);
     annc->error(0.0001);
     std::cout << "Lambda function: " << std::endl;
-    std::function<void(double, double)> callback = [&](double trainingError, double testingError)
+    std::function<void(long, double, double)> callback = [&](long iteration, double trainingError, double testingError)
     {
-        std::cout << trainingError << " - " << testingError << std::endl;
+        std::cout << "iteration: " << iteration << " " << trainingError << " - " << testingError << std::endl;
     };
     std::vector<std::vector<double>> validationSets;
 

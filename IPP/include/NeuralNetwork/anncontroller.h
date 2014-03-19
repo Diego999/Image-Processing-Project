@@ -17,7 +17,7 @@ public:
     ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet);
     ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet);
 
-    void train(const std::function<void(double, double)> &callback);
+    void train(const std::function<void(long, double, double)> &callback);
     const std::vector<double>& feedForward(const std::vector<double>& dataInputs);
     const std::vector<std::vector<double>>& feedForward(const std::vector<std::vector<double>>& dataInputs);
     std::vector<double> weights(int numLayer, int numNeuron) const;
