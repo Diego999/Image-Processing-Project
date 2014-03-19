@@ -42,7 +42,8 @@ SOURCES += src/main.cpp \
     src/GUI/graphicsview.cpp \
     src/GUI/graphicsscene.cpp \
     src/GUI/pixmap.cpp \
-    src/GUI/anngraphics.cpp
+    src/GUI/anngraphics.cpp \
+    src/Controller/ippcontroller.cpp
 
 HEADERS += \
     include/Utils/utils.h \
@@ -56,4 +57,5 @@ HEADERS += \
     include/GUI/graphicsview.h \
     include/GUI/graphicsscene.h \
     include/GUI/pixmap.h \
-    include/GUI/anngraphics.h
+    include/GUI/anngraphics.h \
+    include/Controller/ippcontroller.h

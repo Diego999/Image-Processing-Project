@@ -1,6 +1,11 @@
-#include <iostream>
 #include "include/GUI/graphicsscene.h"
 #include "include/GUI/pixmap.h"
+
+#include <qwt_symbol.h>
+
+#include <tuple>
+#include <iostream>
+
 
 GraphicsScene::GraphicsScene(qreal width, qreal height) : QGraphicsScene(0, 0, width, height)
 {
@@ -9,6 +14,9 @@ GraphicsScene::GraphicsScene(qreal width, qreal height) : QGraphicsScene(0, 0, w
 
 void GraphicsScene::createUI()
 {
+    /**
+      http://qt-project.org/doc/qt-5/statemachine-api.html
+      **/
     // Text edit and button
     QPushButton *newButton = new QPushButton(tr("New"));
     QPushButton *importButton = new QPushButton(tr("Import..."));
@@ -17,12 +25,19 @@ void GraphicsScene::createUI()
     QPushButton *nextButton = new QPushButton("N");
     QPushButton *backButton = new QPushButton("B");
 
+    std::vector<std::tuple<std::string, QwtSymbol*, QPen>> curves;
+    curves.push_back(std::make_tuple("Training Set Error", new QwtSymbol(QwtSymbol::Rect, QBrush(Qt::blue), QPen(Qt::blue, 3), QSize(4, 4)), QPen(Qt::blue, 1)));
+
+    annGraphics =  new ANNGraphics(curves, "Number of iterations", "Error");
+
     QGraphicsProxyWidget *newButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *importButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *trainingButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *testButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *nextButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *backButtonProxy = new QGraphicsProxyWidget;
+
+    QGraphicsProxyWidget *annGraphicsProxy = new QGraphicsProxyWidget;
 
     newButtonProxy->setWidget(newButton);
     importButtonProxy->setWidget(importButton);
@@ -31,12 +46,16 @@ void GraphicsScene::createUI()
     nextButtonProxy->setWidget(nextButton);
     backButtonProxy->setWidget(backButton);
 
+    annGraphicsProxy->setWidget(annGraphics);
+
     addItem(newButtonProxy);
     addItem(importButtonProxy);
     addItem(trainingButtonProxy);
     addItem(testButtonProxy);
     addItem(nextButtonProxy);
     addItem(backButtonProxy);
+
+    addItem(annGraphicsProxy);
 
     QStateMachine *machine = new QStateMachine;
     QState *stateStart = new QState(machine);
@@ -47,8 +66,6 @@ void GraphicsScene::createUI()
 
     qreal width = this->width();
     qreal height = this->height();
-
-    std::cout << width << std::endl;
 
     // State Start
     // bottom buttons
@@ -159,4 +176,9 @@ void GraphicsScene::createUI()
     t6->addAnimation(new QPropertyAnimation(testButtonProxy, "pos"));
 
     machine->start();
+}
+
+void GraphicsScene::addPoint(const std::vector<QPointF>& point)
+{
+    annGraphics->addPoint(point);
 }

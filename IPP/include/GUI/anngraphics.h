@@ -12,7 +12,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 
-class ANNGraphics
+class ANNGraphics : public QwtPlot
 {
 public:
     ANNGraphics(const std::vector<std::tuple<std::string, QwtSymbol*, QPen>>& curves, const std::string& titleX, const std::string& titleY);
@@ -20,10 +20,7 @@ public:
     void addPoints(const std::vector<std::vector<QPointF>>& points);
     void addPoint(const std::vector<QPointF>& point);
 
-    void resize(const QSize& size);
-
 private:
-    QwtPlot plot;
     QwtPlotGrid grid;
 
     std::vector<std::pair<std::shared_ptr<QwtPlotCurve>, QPolygonF>> curves;

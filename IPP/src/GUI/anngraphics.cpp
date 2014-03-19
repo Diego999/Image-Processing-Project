@@ -1,4 +1,4 @@
-#include "anngraphics.h"
+#include "include/GUI/anngraphics.h"
 
 #include <qwt_legend.h>
 
@@ -13,22 +13,21 @@ ANNGraphics::ANNGraphics(const std::vector<std::tuple<std::string, QwtSymbol*, Q
         curve->setRenderHint(QwtPlotItem::RenderAntialiased, true);
         curve->setSymbol(std::get<1>(tuple));
         curve->setSamples(points);
-        curve->attach(&plot);
+        curve->attach(this);
 
         this->curves.push_back(std::pair<std::shared_ptr<QwtPlotCurve>, QPolygonF>(curve, points));
     }
 
-    plot.setCanvasBackground(Qt::white);
-    plot.setAxisScale(QwtPlot::yLeft, 0, 0);
-    plot.insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    plot.enableAxis(QwtPlot::xBottom);
-    plot.enableAxis(QwtPlot::yLeft);
-    plot.setAxisAutoScale(QwtPlot::xBottom, true);
-    plot.setAxisAutoScale(QwtPlot::yLeft, true);
-    plot.setAxisTitle(QwtPlot::xBottom, QString::fromStdString(titleX));
-    plot.setAxisTitle(QwtPlot::yLeft, QString::fromStdString(titleY));
-    grid.attach(&plot);
-    plot.show();
+    this->setCanvasBackground(Qt::white);
+    this->setAxisScale(QwtPlot::yLeft, 0, 0);
+    this->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
+    this->enableAxis(QwtPlot::xBottom);
+    this->enableAxis(QwtPlot::yLeft);
+    this->setAxisAutoScale(QwtPlot::xBottom, true);
+    this->setAxisAutoScale(QwtPlot::yLeft, true);
+    this->setAxisTitle(QwtPlot::xBottom, QString::fromStdString(titleX));
+    this->setAxisTitle(QwtPlot::yLeft, QString::fromStdString(titleY));
+    grid.attach(this);
 }
 
 void ANNGraphics::addPoints(const std::vector<std::vector<QPointF>> &points)
@@ -48,11 +47,6 @@ void ANNGraphics::addPoint(const std::vector<QPointF>& point)
             curve->first->setSamples(curve->second);
             ++curve;
         }
-        plot.replot();
+        this->replot();
     }
-}
-
-void ANNGraphics::resize(const QSize& size)
-{
-    plot.resize(size);
 }
