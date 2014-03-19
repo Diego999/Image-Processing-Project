@@ -9,12 +9,11 @@
 class PictureController
 {
 public:
-    static std::vector<std::vector<double>> loadPictures(const std::vector<std::string>& filepaths);
-    static QImage create(const std::vector<double>& values, int width);
-    static QImage createThresholded(const std::vector<double>& values, int width);
+    static std::vector<std::vector<double>> loadPictures(const std::vector<std::string>& filepaths, bool otsu);
+    static QImage create(const std::vector<double>& values, int width, bool otsu = false);
 
 private:
-    static std::vector<double> otsuSegmentation(const std::vector<double>& picture);
+    static void otsuSegmentation(std::vector<double> &picture);
     static double variance(double x, double m) {return (x-m)*(x-m);}
 };
 
