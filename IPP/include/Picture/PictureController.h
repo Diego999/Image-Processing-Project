@@ -9,7 +9,7 @@
 class PictureController
 {
 public:
-    static std::vector<std::vector<double>> loadPictures(const std::vector<std::string>& filepaths, bool otsu);
+    static std::vector<std::vector<double>> loadPictures(const std::vector<std::string>& filepaths, bool otsu = false);
     static QImage create(const std::vector<double>& values, int width, bool otsu = false);
 
 private:
