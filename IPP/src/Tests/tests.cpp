@@ -1,5 +1,6 @@
 #include "include/Tests/tests.h"
 #include "include/NeuralNetwork/artificialneuralnetwork.h"
+#include "include/NeuralNetwork/anncontroller.h"
 
 #include <string>
 #include <vector>
@@ -75,4 +76,40 @@ void testsANN()
         }
         std::cout << "Error : " << err << std::endl << "iterations " << k << std::endl << std::endl;
     }
+}
+
+void testsANNController()
+{
+    std::string filepath = "testsANNController.ann";
+    std::vector<std::pair<std::vector<double>, std::vector<double>>> testSets;
+
+    testSets.push_back({{0,0},{0.1}});
+    testSets.push_back({{0,1},{0.9}});
+    testSets.push_back({{1,0},{0.9}});
+    testSets.push_back({{1,1},{0.1}});
+    ANNController* annc = new ANNController(2, 1, {3}, 0.5, 0.5,testSets, testSets);
+    annc->error(0.0001);
+    std::cout << "Lambda function: " << std::endl;
+    std::function<void(double, double)> callback = [&](double trainingError, double testingError)
+    {
+        std::cout << trainingError << " - " << testingError << std::endl;
+    };
+    std::vector<std::vector<double>> validationSets;
+
+    validationSets.push_back({0,0});
+    validationSets.push_back({0,1});
+    validationSets.push_back({1,0});
+    validationSets.push_back({1,1});
+
+    annc->train(callback);
+    annc->exportANN(filepath);
+    for(auto& result : annc->feedForward(validationSets))
+        std::cout << result[0] << std::endl;
+
+    ANNController* annc2 = new ANNController(filepath);
+    for(auto& result : annc2->feedForward(validationSets))
+        std::cout << result[0] << std::endl;
+
+    std::cout << annc->log();
+    std::cout << annc2->log();
 }
