@@ -33,7 +33,8 @@ SOURCES += src/main.cpp \
     src/Utils/settings.cpp \
     src/NeuralNetwork/artificialneuralnetwork.cpp \
     src/Tests/tests.cpp \
-    src/Picture/PictureController.cpp
+    src/Picture/PictureController.cpp \
+    src/NeuralNetwork/anncontroller.cpp
 
 HEADERS += \
     include/Utils/utils.h \
@@ -43,3 +44,4 @@ HEADERS += \
     include/NeuralNetwork/artificialneuralnetwork.h \
     include/Tests/tests.h \
     include/Picture/PictureController.h
+    include/NeuralNetwork/anncontroller.h

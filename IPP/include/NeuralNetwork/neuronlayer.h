@@ -2,6 +2,7 @@
 #define NEURON_LAYER_H
 
 #include <vector>
+#include <memory>
 
 class Neuron;
 
