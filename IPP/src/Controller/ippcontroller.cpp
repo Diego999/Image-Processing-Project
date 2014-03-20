@@ -1,5 +1,7 @@
 #include "include/Controller/ippcontroller.h"
 
+#include <QPointF>
+
 IPPController::IPPController(GraphicsScene& graphicsScene)
 {
     std::vector<std::pair<std::vector<double>, std::vector<double>>> testSets;
@@ -16,7 +18,13 @@ IPPController::IPPController(GraphicsScene& graphicsScene)
     {
         graphicsScene.addPoint({QPointF(iteration,trainingError)});
     };
-    t = std::thread([=](){
+
+    thread = std::shared_ptr<std::thread>(new std::thread([=](){
         annController->train(callback);
-    });
+    }));
+}
+
+IPPController::~IPPController()
+{
+    thread->join();
 }
