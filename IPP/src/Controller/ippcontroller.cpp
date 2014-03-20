@@ -10,12 +10,13 @@ IPPController::IPPController(GraphicsScene& graphicsScene)
     testSets.push_back({{1,1},{0.1}});
     annController = new ANNController(2, 1, {3}, 0.5, 0.5, testSets);
 
-    annController->error(0.0001);
+    annController->error(0.000001);
 
     std::function<void(long, double, double)> callback = [&](long iteration, double trainingError, double testingError)
     {
         graphicsScene.addPoint({QPointF(iteration,trainingError)});
     };
-
-    annController->train(callback);
+    t = std::thread([=](){
+        annController->train(callback);
+    });
 }

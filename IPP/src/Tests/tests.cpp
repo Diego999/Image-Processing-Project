@@ -88,7 +88,7 @@ void testsANNController()
     testSets.push_back({{1,0},{0.9}});
     testSets.push_back({{1,1},{0.1}});
     ANNController* annc = new ANNController(2, 1, {3}, 0.5, 0.5,testSets, testSets);
-    annc->error(0.0001);
+    annc->error(0.01);
     std::cout << "Lambda function: " << std::endl;
     std::function<void(long, double, double)> callback = [&](long iteration, double trainingError, double testingError)
     {
@@ -112,4 +112,6 @@ void testsANNController()
 
     std::cout << annc->log();
     std::cout << annc2->log();
+    delete annc;
+    delete annc2;
 }

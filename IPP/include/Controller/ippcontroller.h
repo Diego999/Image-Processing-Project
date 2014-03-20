@@ -4,12 +4,20 @@
 #include "include/NeuralNetwork/anncontroller.h"
 #include "include/GUI/graphicsscene.h"
 
-class IPPController
+#include <QPointF>
+#include <QObject>
+
+#include <thread>
+
+
+class IPPController : QObject
 {
+    Q_OBJECT
 public:
     IPPController(GraphicsScene& graphicsScene);
 private:
     ANNController* annController;
+    std::thread t;
 
 };
 

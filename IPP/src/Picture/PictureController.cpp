@@ -18,13 +18,15 @@ std::vector<std::vector<double>> PictureController::loadPictures(const std::vect
         for(int i = 0; i < picture.height(); ++i)
             for(int j = 0; j < picture.width(); ++j)
                 data.push_back(QColor(picture.pixel(j, i)).red());
-        output.push_back(otsu ? otsuSegmentation(data) : data);
+        if(otsu)
+            otsuSegmentation(data);
+        output.push_back(data);
     }
 
     return output;
 }
 
-QImage PictureController::create(const std::vector<double>& values, int width, bool otsu)
+QImage PictureController::create(const std::vector<double>& values, int width)
 {
     QImage picture(width, values.size()/width, QImage::Format_RGB888);
 
@@ -32,7 +34,7 @@ QImage PictureController::create(const std::vector<double>& values, int width, b
     for(size_t i = 0; i < values.size(); ++i)
         picture.setPixel(i%picture.width(), i/picture.width(), qRgb(ratio*values[i], ratio*values[i], ratio*values[i]));
 
-    return otsu ? otsuSegmentation(picture) : picture;
+    return picture;
 }
 
 void PictureController::otsuSegmentation(std::vector<double> &picture)

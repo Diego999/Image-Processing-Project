@@ -176,9 +176,20 @@ void GraphicsScene::createUI()
     t6->addAnimation(new QPropertyAnimation(testButtonProxy, "pos"));
 
     machine->start();
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updatePoints()));
+    timer->start();
+}
+
+void GraphicsScene::updatePoints()
+{
+    // No need mutex cause all operations on QQueue are reentrant
+    if(!futurePoints.isEmpty())
+        annGraphics->addPoint(futurePoints.dequeue());
 }
 
 void GraphicsScene::addPoint(const std::vector<QPointF>& point)
 {
-    annGraphics->addPoint(point);
+    futurePoints.enqueue(point);
 }
