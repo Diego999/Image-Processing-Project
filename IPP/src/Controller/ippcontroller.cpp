@@ -60,7 +60,7 @@ IPPController::IPPController(GraphicsScene& graphicsScene)
     testSets.push_back({{1,0},{0.9}});
     testSets.push_back({{1,1},{0.1}});*/
 
-    annController = new ANNController(30*32, 1, {30}, 0.5, 0.5, trainingSet, validationSet);
+    annController = new ANNController({10}, 0.3, 0.3, trainingSet, validationSet);
 
     annController->error(0.01);
 
@@ -80,10 +80,39 @@ IPPController::~IPPController()
     thread->join();
 }
 
-std::vector<std::vector<double>> IPPController::generateTargets(std::vector<std::string> files)
+double IPPController::testValidity(const std::vector<std::string>& filepaths) const
+{
+    //Make it proper
+    QString filePath("/Users/diego/test/all_train.list");
+
+    std::vector<std::string> filePaths;
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        std::cout << "[Can't open file] -> " << filePath.toStdString() << std::endl;
+        return -1;
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd())
+        filePaths.push_back(in.readLine().toStdString());
+
+    std::cout << "[File path extract]" << std::endl;
+
+    std::vector<std::vector<double>> inputSet = PictureController::loadPictures(filePaths);
+    std::vector<std::vector<double>> targetSet = generateTargets(filePaths);
+
+    std::vector<std::pair<std::vector<double>, std::vector<double>>> set;
+
+    for(size_t i = 0; i < inputSet.size(); ++i)
+        set.push_back({inputSet[i], targetSet[i]});
+    return annController->test(set);
+}
+
+std::vector<std::vector<double>> IPPController::generateTargets(const std::vector<std::string>& files) const
 {
     std::vector<std::vector<double>> targets;
-    for(std::string file : files)
+    for(auto& file : files)
     {
         std::vector<double> target;
         std::vector<std::string> tokens;
@@ -91,10 +120,7 @@ std::vector<std::vector<double>> IPPController::generateTargets(std::vector<std:
         std::string s;
         while(std::getline(f, s, '_'))
             tokens.push_back(s);
-        if(tokens[3]=="open")
-            target.push_back(0.1);
-        else
-            target.push_back(0.9);
+        target.push_back(tokens[3]=="open" ? 0.1 : 0.9);
         targets.push_back(target);
     }
     return targets;

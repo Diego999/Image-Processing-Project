@@ -13,8 +13,9 @@ public:
     IPPController(GraphicsScene& graphicsScene);
     ~IPPController();
 
+    double testValidity(const std::vector<std::string>& filepaths) const;
 private:
-    std::vector<std::vector<double>> generateTargets(std::vector<std::string>);
+    std::vector<std::vector<double>> generateTargets(const std::vector<std::string> &) const;
     ANNController* annController;
     std::shared_ptr<std::thread> thread;
 };
