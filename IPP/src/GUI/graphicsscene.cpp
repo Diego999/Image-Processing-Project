@@ -25,9 +25,8 @@ void GraphicsScene::createUI()
     QPushButton *nextButton = new QPushButton("N");
     QPushButton *backButton = new QPushButton("B");
 
-    std::vector<std::tuple<std::string, QwtSymbol*, QPen>> curves;
-    curves.push_back(std::make_tuple("Training Set Error", new QwtSymbol(QwtSymbol::Rect, QBrush(Qt::blue), QPen(Qt::blue, 3), QSize(4, 4)), QPen(Qt::blue, 1)));
-
+    std::vector<std::tuple<std::string, QPen>> curves;
+    curves.push_back(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)));
     annGraphics =  new ANNGraphics(curves, "Number of iterations", "Error");
 
     QGraphicsProxyWidget *newButtonProxy = new QGraphicsProxyWidget;

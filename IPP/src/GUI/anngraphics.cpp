@@ -1,23 +1,43 @@
 #include "include/GUI/anngraphics.h"
 
 #include <qwt_legend.h>
+#include <tuple>
 
-ANNGraphics::ANNGraphics(const std::vector<std::tuple<std::string, QwtSymbol*, QPen> > &curves, const std::string& titleX, const std::string& titleY)
+ANNGraphics::ANNGraphics(const std::vector<std::tuple<std::string, QPen, QwtSymbol*> > &curves, const std::string& titleX, const std::string& titleY)
 {
     for(auto& tuple : curves)
     {
         std::shared_ptr<QwtPlotCurve> curve(new QwtPlotCurve(QString::fromStdString(std::get<0>(tuple))));
-        QPolygonF points;
-
-        curve->setPen(std::get<2>(tuple));
-        curve->setRenderHint(QwtPlotItem::RenderAntialiased, true);
-        curve->setSymbol(std::get<1>(tuple));
-        curve->setSamples(points);
-        curve->attach(this);
-
-        this->curves.push_back(std::pair<std::shared_ptr<QwtPlotCurve>, QPolygonF>(curve, points));
+        curve->setPen(std::get<1>(tuple));
+        curve->setSymbol(std::get<2>(tuple));
+        initLoop(curve);
     }
+    initBasic(titleX, titleY);
+}
 
+ANNGraphics::ANNGraphics(const std::vector<std::tuple<std::string, QPen>>& curves, const std::string& titleX, const std::string& titleY)
+{
+    for(auto& tuple : curves)
+    {
+        std::shared_ptr<QwtPlotCurve> curve(new QwtPlotCurve(QString::fromStdString(std::get<0>(tuple))));
+        curve->setPen(std::get<1>(tuple));
+        initLoop(curve);
+    }
+    initBasic(titleX, titleY);
+}
+
+void ANNGraphics::initLoop(std::shared_ptr<QwtPlotCurve> curve)
+{
+    QPolygonF points;
+    curve->setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    curve->setSamples(points);
+    curve->attach(this);
+    this->curves.push_back(std::pair<std::shared_ptr<QwtPlotCurve>, QPolygonF>(curve, points));
+}
+
+
+void ANNGraphics::initBasic(const std::string& titleX, const std::string& titleY)
+{
     this->setCanvasBackground(Qt::white);
     this->setAxisScale(QwtPlot::yLeft, 0, 0);
     this->insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
