@@ -14,6 +14,7 @@ public:
     ~IPPController();
 
 private:
+    std::vector<std::vector<double>> generateTargets(std::vector<std::string>);
     ANNController* annController;
     std::shared_ptr<std::thread> thread;
 };

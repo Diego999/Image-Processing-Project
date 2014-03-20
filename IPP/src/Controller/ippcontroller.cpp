@@ -1,24 +1,75 @@
 #include "include/Controller/ippcontroller.h"
+#include "include/Picture/PictureController.h"
+
+#include <iostream>
+#include <sstream>
 
 #include <QPointF>
+#include <QDir>
+#include <QFile>
 
 IPPController::IPPController(GraphicsScene& graphicsScene)
 {
+    QDir dir = QDir::current();
+
+    QStringList filters;
+    filters << "*.list";
+    dir.setNameFilters(filters);
+    QStringList files = dir.entryList();
+    std::vector<std::vector<std::string>> filesPath;
+    for(QString filePath : files)
+    {
+        std::vector<std::string> currentFilePaths;
+        QFile file(dir.absolutePath().append("/").append(filePath));
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            std::cout << "[Can't open file] -> " << filePath.toStdString() << std::endl;
+            return;
+        }
+
+        QTextStream in(&file);
+        while (!in.atEnd())
+            currentFilePaths.push_back(dir.absolutePath().append(in.readLine()).toStdString());
+        filesPath.push_back(currentFilePaths);
+    }
+
+    std::cout << "[File path extract]" << std::endl;
+
+    std::vector<std::vector<double>> inputsTrainingSet = PictureController::loadPictures(filesPath[1]);
+    std::vector<std::vector<double>> targetsTrainingSet = generateTargets(filesPath[1]);
+    std::vector<std::vector<double>> inputsValidationSet = PictureController::loadPictures(filesPath[0]);
+    std::vector<std::vector<double>> targetsValidationSet = generateTargets(filesPath[0]);
+
+    std::cout << "[Picutes loaded]" << std::endl;
+
+    std::vector<std::pair<std::vector<double>, std::vector<double>>> trainingSet, validationSet;
+
+    for(size_t i = 0; i < inputsTrainingSet.size(); ++i)
+        trainingSet.push_back({inputsTrainingSet[i], targetsTrainingSet[i]});
+    for(size_t i = 0; i < inputsValidationSet.size(); ++i)
+        validationSet.push_back({inputsValidationSet[i], targetsValidationSet[i]});
+
+
+    std::cout << "[Set created]" << std::endl;
+
+    /*
     std::vector<std::pair<std::vector<double>, std::vector<double>>> testSets;
 
     testSets.push_back({{0,0},{0.1}});
     testSets.push_back({{0,1},{0.9}});
     testSets.push_back({{1,0},{0.9}});
-    testSets.push_back({{1,1},{0.1}});
-    annController = new ANNController(2, 1, {3}, 0.5, 0.5, testSets);
+    testSets.push_back({{1,1},{0.1}});*/
 
-    annController->error(0.000001);
+    annController = new ANNController(30*32, 1, {30}, 0.5, 0.5, trainingSet, validationSet);
+
+    annController->error(0.01);
 
     std::function<void(long, double, double)> callback = [&](long iteration, double trainingError, double testingError)
     {
-        graphicsScene.addPoint({QPointF(iteration,trainingError)});
+        graphicsScene.addPoint({QPointF(iteration,trainingError), QPointF(iteration,testingError)});
     };
 
+    std::cout << "[Training start]" << std::endl;
     thread = std::shared_ptr<std::thread>(new std::thread([=](){
         annController->train(callback);
     }));
@@ -27,4 +78,24 @@ IPPController::IPPController(GraphicsScene& graphicsScene)
 IPPController::~IPPController()
 {
     thread->join();
+}
+
+std::vector<std::vector<double>> IPPController::generateTargets(std::vector<std::string> files)
+{
+    std::vector<std::vector<double>> targets;
+    for(std::string file : files)
+    {
+        std::vector<double> target;
+        std::vector<std::string> tokens;
+        std::istringstream f(file);
+        std::string s;
+        while(std::getline(f, s, '_'))
+            tokens.push_back(s);
+        if(tokens[3]=="open")
+            target.push_back(0.1);
+        else
+            target.push_back(0.9);
+        targets.push_back(target);
+    }
+    return targets;
 }

@@ -27,6 +27,7 @@ void GraphicsScene::createUI()
 
     std::vector<std::tuple<std::string, QPen>> curves;
     curves.push_back(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)));
+    curves.push_back(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));
     annGraphics =  new ANNGraphics(curves, "Number of iterations", "Error");
 
     QGraphicsProxyWidget *newButtonProxy = new QGraphicsProxyWidget;
