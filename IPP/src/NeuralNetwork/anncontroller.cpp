@@ -15,14 +15,14 @@ ANNController::ANNController(int nbInputs, int nbOutputs, const std::vector<int>
     m_error = DEFAULT_ERROR;
 }
 
-ANNController::ANNController(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet) :
-    ANNController(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum)
+ANNController::ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet) :
+    ANNController(trainingSet[0].first.size(), trainingSet[0].second.size(), nbNeuronsPerHiddenLayer, learningRate, momentum)
 {
     m_trainingSet = trainingSet;
 }
 
-ANNController::ANNController(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet) :
-    ANNController(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum, trainingSet)
+ANNController::ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet) :
+    ANNController(nbNeuronsPerHiddenLayer, learningRate, momentum, trainingSet)
 {
     m_testSet = testSet;
 }
@@ -76,17 +76,42 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
     } while(totalCurrentErrorTraining >= m_error);
 }
 
+double ANNController::test(const std::vector<std::pair<std::vector<double>, std::vector<double>>>& set) const
+{
+    double tot = 0;
+    for(auto& pair : set)
+    {
+        std::vector<double> output = m_ann->feedForward(pair.first);
+        if(output.size() == pair.second.size())
+        {
+            auto it1 = output.cbegin();
+            auto it2 = pair.second.cbegin();
+            bool isOk = true;
+            while(it1 != output.cend() && it2 != pair.second.cend() && isOk)
+            {
+                std::cout << *it1 << " " << *it2 << std::endl;
+                if((*it1 < 0.5 && *it2 >= 0.5) || (*it1 >= 0.5 && *it2 < 0.5))
+                    isOk = false;
+                ++it1;++it2;
+            }
+            if(isOk)
+                ++tot;
+        }
+    }
+    return 100.0*tot/set.size();
+}
+
 const std::vector<double>&  ANNController::feedForward(const std::vector<double>& dataInputs)
 {
     return m_ann->feedForward(dataInputs);
 }
 
-const std::vector<std::vector<double>>&  ANNController::feedForward(const std::vector<std::vector<double>>& dataInputs)
+std::vector<std::vector<double>>  ANNController::feedForward(const std::vector<std::vector<double>>& dataInputs)
 {
-                                      std::vector<std::vector<double>>* results = new std::vector<std::vector<double>>();
-                                      for(size_t i = 0; i < dataInputs.size(); ++i)
-results->push_back(m_ann->feedForward(dataInputs[i]));
-return *results;
+    std::vector<std::vector<double>> results;
+    for(size_t i = 0; i < dataInputs.size(); ++i)
+        results.push_back(m_ann->feedForward(dataInputs[i]));
+    return results;
 }
 
 std::vector<double> ANNController::weights(int numLayer, int numNeuron) const
