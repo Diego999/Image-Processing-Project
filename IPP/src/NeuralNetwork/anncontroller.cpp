@@ -68,7 +68,7 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
         while(++j < testQuantity)
         {
             std::pair<std::vector<double>, std::vector<double>> test = m_testSet[j];
-            totalCurrentErrorTest += m_ann->train(test.first, test.second);
+            totalCurrentErrorTest += m_ann->validate(test.first, test.second);
         }
 
         callback(iteration, totalCurrentErrorTraining, totalCurrentErrorTest);
