@@ -5,6 +5,7 @@
 
 #include <tuple>
 #include <iostream>
+#include <QMutex>
 
 
 GraphicsScene::GraphicsScene(qreal width, qreal height) : QGraphicsScene(0, 0, width, height)
@@ -184,12 +185,15 @@ void GraphicsScene::createUI()
 
 void GraphicsScene::updatePoints()
 {
-    // No need mutex cause all operations on QQueue are reentrant
+    mutex.lock();
     if(!futurePoints.isEmpty())
         annGraphics->addPoint(futurePoints.dequeue());
+    mutex.unlock();
 }
 
 void GraphicsScene::addPoint(const std::vector<QPointF>& point)
 {
+    mutex.lock();
     futurePoints.enqueue(point);
+    mutex.unlock();
 }

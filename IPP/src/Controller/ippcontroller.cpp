@@ -8,7 +8,7 @@
 #include <QDir>
 #include <QFile>
 
-IPPController::IPPController(GraphicsScene& graphicsScene)
+IPPController::IPPController(GraphicsScene& graphicsScene):annController(nullptr)
 {
     QDir dir = QDir::current();
 
@@ -77,7 +77,8 @@ IPPController::IPPController(GraphicsScene& graphicsScene)
 
 IPPController::~IPPController()
 {
-    thread->join();
+    if(annController != nullptr)
+        annController->stopTraining();
 }
 
 double IPPController::testValidity(const std::vector<std::string>& filepaths) const

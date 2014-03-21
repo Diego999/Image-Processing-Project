@@ -8,6 +8,7 @@
 #include <QQueue>
 #include <QVector>
 #include <QPointF>
+#include <QMutex>
 
 class GraphicsScene : public QGraphicsScene
 {
@@ -25,6 +26,7 @@ private:
     QTimer *timer;
     ANNGraphics* annGraphics;
     QQueue<std::vector<QPointF>> futurePoints;
+    QMutex mutex;
 };
 
 #endif // GRAPHICSSCENE_H
