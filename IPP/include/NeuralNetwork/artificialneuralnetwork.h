@@ -19,6 +19,7 @@ public:
 
     const std::vector<double>& feedForward(const std::vector<double>& dataInputs);
     double train(const std::vector<double>& dataInputs, const std::vector<double>& dataTargets);
+    double validate(const std::vector<double>& dataInputs, const std::vector<double>& dataTargets);
 
     int nbInputs() const {return m_nbInputs;}
     int nbOutputs() const {return m_nbOutputs;}

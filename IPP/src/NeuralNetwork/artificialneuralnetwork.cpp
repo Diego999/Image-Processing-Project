@@ -57,6 +57,18 @@ double ArtificialNeuralNetwork::train(const std::vector<double>& dataInputs, con
     return errorTot;
 }
 
+double ArtificialNeuralNetwork::validate(const std::vector<double>& dataInputs, const std::vector<double>& dataTargets)
+{
+    m_inputs[0] = dataInputs;
+    m_targets = dataTargets;
+
+    layerForward();
+    double errorTot = 0;
+    errorTot += computeOutputError();
+    errorTot += computeHiddenError();
+    return errorTot;
+}
+
 void ArtificialNeuralNetwork::layerForward()
 {
     for(size_t i = 0; i < m_layers.size(); ++i)
