@@ -9,7 +9,7 @@
 #define DEFAULT_ERROR 0.001
 #define SPACE " "
 
-ANNController::ANNController(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
+ANNController::ANNController(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum):m_stopTraining(false)
 {
     createANN(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum);
     m_error = DEFAULT_ERROR;
@@ -27,7 +27,7 @@ ANNController::ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, do
     m_testSet = testSet;
 }
 
-ANNController::ANNController(const std::string& filepath)
+ANNController::ANNController(const std::string& filepath):m_stopTraining(false)
 {
     importANN(filepath);
     m_error = DEFAULT_ERROR;
@@ -53,6 +53,8 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
     long iteration = 0L;
     double totalCurrentErrorTraining;
     double totalCurrentErrorTest;
+    m_stopTraining = false;
+
     do
     {
         j = -1;
@@ -73,7 +75,7 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
 
         callback(iteration, totalCurrentErrorTraining, totalCurrentErrorTest);
         iteration++;
-    } while(totalCurrentErrorTraining >= m_error);
+    } while(totalCurrentErrorTraining >= m_error && !m_stopTraining);
 }
 
 double ANNController::test(const std::vector<std::pair<std::vector<double>, std::vector<double>>>& set) const

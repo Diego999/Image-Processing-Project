@@ -20,6 +20,7 @@ public:
 
     void train(const std::function<void(long, double, double)> &callback);
     double test(const std::vector<std::pair<std::vector<double>, std::vector<double>>>& set) const;
+    void stopTraining() {m_stopTraining = true};
 
     const std::vector<double>& feedForward(const std::vector<double>& dataInputs);
     std::vector<std::vector<double>> feedForward(const std::vector<std::vector<double>>& dataInputs);
@@ -42,6 +43,7 @@ private:
     std::vector<std::pair<std::vector<double>, std::vector<double>>> m_testSet;
 
     double m_error;
+    bool m_stopTraining;
 };
 
 #endif // ANNCONTROLLER_H
