@@ -79,6 +79,7 @@ IPPController::~IPPController()
 {
     if(annController != nullptr)
         annController->stopTraining();
+    thread->join();
 }
 
 double IPPController::testValidity(const std::vector<std::string>& filepaths) const
