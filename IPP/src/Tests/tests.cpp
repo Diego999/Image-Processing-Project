@@ -140,3 +140,32 @@ void testsANNMerge()
     assert(ipp_utils::compare(ann.learningRate(), 0.1));
     assert(ipp_utils::compare(ann.momentum(), 0.2));
 }
+
+void testMergeVector()
+{
+    std::vector<int> v({1,2,3,4,5,6,7,8,9,10});
+    std::vector<std::vector<int>> v2({{11,12}, {13,14}, {15, 16, 17, 18, 19}, {20}});
+    ipp_utils::mergeVectors(v, v2);
+    for(int i = 0; i < 20; ++i)
+        assert(v[i] == (i+1));
+}
+
+void testCreateSubSamples()
+{
+    for(int s = 1; s <= 20; ++s)
+    {
+        std::vector<int> sets;
+        for(int ss = 1; ss <= s; ++ss)
+            sets.push_back(ss);
+        for(int k = 1; k <= s; ++k)
+        {
+            int i = 1;
+            for(auto& v:ipp_utils::createSubSamples(sets, k))
+            {
+                assert(v.size() < 2*(sets.size()/k));
+                for(auto& vv:v)
+                    assert(vv == i++);
+            }
+        }
+    }
+}
