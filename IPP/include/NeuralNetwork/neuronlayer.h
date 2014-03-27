@@ -12,7 +12,7 @@ public:
     NeuronLayer(int nbNeurons, int nbInputs);
     ~NeuronLayer();
 
-    int nbNeurons() const {return m_nbNeurons;}
+    int nbNeurons() const {return m_neurons.size();}
     const std::vector<std::shared_ptr<Neuron>>& neurons() const {return m_neurons;}
     size_t size() const {return m_neurons.size();}
 
@@ -32,7 +32,6 @@ public:
     const std::shared_ptr<Neuron>& operator[](int i) const {return m_neurons[i];}
 
 private:
-    int m_nbNeurons;
     std::vector<std::shared_ptr<Neuron>> m_neurons;
 };
 
