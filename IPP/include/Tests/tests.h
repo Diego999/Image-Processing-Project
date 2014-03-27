@@ -3,5 +3,6 @@
 
 void testsANN();
 void testsANNController();
+void testsANNMerge();
 
 #endif // TESTS_IPP_H

@@ -2,6 +2,8 @@
 #define UTILS_H
 
 #include <vector>
+#include <limits>
+#include <cmath>
 
 namespace ipp_random
 {
@@ -14,6 +16,12 @@ namespace ipp_random
 
 namespace ipp_utils
 {
+    template<typename T>
+    bool compare(const T a, const T b, T e = std::numeric_limits<T>::epsilon())
+    {
+        return fabs(a-b) < e;
+    }
+
     template<typename T>
     void mergeVectors(std::vector<T>& v1, const std::vector<std::vector<T>>& v2)
     {

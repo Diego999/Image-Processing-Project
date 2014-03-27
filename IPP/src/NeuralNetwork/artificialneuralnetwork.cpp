@@ -35,7 +35,13 @@ ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, co
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(const ArtificialNeuralNetwork& ann)
     :ArtificialNeuralNetwork(ann.m_nbInputs, ann.m_nbOutputs, ann.m_nbNeuronsPerHiddenLayer, ann.m_learningRate, ann.m_momentum)
 {
-
+    for(size_t i = 0; i < m_layers.size(); ++i)
+        for(size_t j = 0; j < m_layers[i]->neurons().size(); ++j)
+        {
+            m_layers[i]->neuron(j)->threshold(ann.m_layers[i]->neuron(j)->threshold());
+            for(int k = 0; k < m_layers[i]->neuron(j)->inputNb(); ++k)
+                m_layers[i]->neuron(j)->weight(k, ann.m_layers[i]->neuron(j)->weight(k));
+        }
 }
 
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(const std::vector<ArtificialNeuralNetwork>& anns)
