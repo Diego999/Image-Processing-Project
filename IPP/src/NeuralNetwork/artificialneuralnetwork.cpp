@@ -7,7 +7,7 @@
 #include <iostream>
 
 ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
-    :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbHiddenLayers(nbNeuronsPerHiddenLayer.size()), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
+    :m_nbInputs(nbInputs), m_nbOutputs(nbOutputs), m_nbNeuronsPerHiddenLayer(nbNeuronsPerHiddenLayer), m_learningRate(learningRate), m_momentum(momentum)
 {
     // We don't treat the case of single perceptron.
     assert(nbNeuronsPerHiddenLayer.size() > 0);
@@ -30,6 +30,12 @@ ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, co
 
     for(int i = 0; i < m_nbOutputs; ++i)
         m_targets.push_back(0);
+}
+
+ArtificialNeuralNetwork::ArtificialNeuralNetwork(const ArtificialNeuralNetwork& ann)
+    :ArtificialNeuralNetwork(ann.m_nbInputs, ann.m_nbOutputs, ann.m_nbNeuronsPerHiddenLayer, ann.m_learningRate, ann.m_momentum)
+{
+
 }
 
 ArtificialNeuralNetwork::~ArtificialNeuralNetwork()
