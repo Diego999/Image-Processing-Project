@@ -4,6 +4,7 @@
 #include <vector>
 #include <limits>
 #include <cmath>
+#include <cassert>
 
 namespace ipp_random
 {
@@ -30,16 +31,19 @@ namespace ipp_utils
     }
 
     template<typename T>
-    std::vector<std::vector<T>> createSubSamples(const std::vector<T>& sets, const int k)
+    std::vector<std::vector<T>> createSubSamples(const std::vector<T>& sets, const unsigned int k)
     {
+        assert(k >= 0);
         std::vector<std::vector<T>> samples;
         int sizeSample = sets.size()/k;
-        for(int i = 0; i < k-1; ++i)
-        {
-            samples.push_back(std::vector<T>());
-            samples.back().insert(samples.back().end(), sets.begin()+i*sizeSample, sets.begin()+(i+1)*sizeSample);
-        }
-        samples.back().insert(samples.back().end(), sets.begin()+(k-1)*sizeSample, sets.end());
+        for(unsigned int i = 0; i*sizeSample < sets.size(); ++i)
+            if(sets.begin()+(i+1)*sizeSample > sets.end())
+                samples.back().insert(samples.back().end(), sets.begin()+i*sizeSample, sets.end());
+            else
+            {
+                samples.push_back(std::vector<T>());
+                samples.back().insert(samples.back().end(), sets.begin()+i*sizeSample, sets.begin()+(i+1)*sizeSample);
+            }
         return samples;
     }
 }
