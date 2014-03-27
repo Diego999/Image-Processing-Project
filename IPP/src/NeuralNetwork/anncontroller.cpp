@@ -60,42 +60,37 @@ ANNController::ANNController(const std::string& filepath, const std::vector<std:
     m_validationSet = validationSet;
 }
 
-void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>, std::vector<double>)> &callback, const unsigned int k)
+void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>, std::vector<double>)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k)
 {
     //TODO
 }
 
 void ANNController::train(const std::function<void(long, double, double)> &callback)
 {
-    const size_t trainingQuantity = m_trainingSet.size();
-    const size_t testQuantity = m_validationSet.size();
-    size_t j;
     long iteration = 0L;
-    double totalCurrentErrorTraining;
-    double totalCurrentErrorTest;
+    double totalCurrentErrorTraining, totalCurrentErrorTest;
     m_stopTraining = false;
-
     do
     {
+        totalCurrentErrorTraining = totalCurrentErrorTest = 0.0;
+        size_t j = -1;
+        while(++j < m_trainingSet.size())
+            totalCurrentErrorTraining += trainIteration(m_trainingSet[j]);
         j = -1;
-        totalCurrentErrorTraining = 0.0;
-        totalCurrentErrorTest = 0.0;
-
-        while(++j < trainingQuantity)
-        {
-            std::pair<std::vector<double>, std::vector<double>> training = m_trainingSet[j];
-            totalCurrentErrorTraining += m_ann->train(training.first, training.second);
-        }
-        j = -1;
-        while(++j < testQuantity)
-        {
-            std::pair<std::vector<double>, std::vector<double>> test = m_validationSet[j];
-            totalCurrentErrorTest += m_ann->validate(test.first, test.second);
-        }
-
-        callback(iteration, totalCurrentErrorTraining, totalCurrentErrorTest);
-        iteration++;
+        while(++j < m_validationSet.size())
+            totalCurrentErrorTest += validateIteration(m_validationSet[j]);
+        callback(iteration++, totalCurrentErrorTraining, totalCurrentErrorTest);
     } while(totalCurrentErrorTraining >= m_error && !m_stopTraining);
+}
+
+double ANNController::trainIteration(const std::pair<std::vector<double>, std::vector<double>>& set)
+{
+    return m_ann->train(set.first, set.second);
+}
+
+double ANNController::validateIteration(const std::pair<std::vector<double>, std::vector<double>>& set)
+{
+    return m_ann->validate(set.first, set.second);
 }
 
 double ANNController::test(const std::vector<std::pair<std::vector<double>, std::vector<double>>>& set) const
