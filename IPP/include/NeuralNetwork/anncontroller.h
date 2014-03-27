@@ -10,16 +10,20 @@ class ArtificialNeuralNetwork;
 
 class ANNController
 {
-public:
+private:
     ANNController(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum);
+    ANNController(const ArtificialNeuralNetwork& ann);
+    ANNController(const ArtificialNeuralNetwork& ann ,const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& validationSet);
+public:
     ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet);
-    ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet);
+    ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& validationSet);
     ANNController(const std::string& filepath);
     ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet);
-    ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet);
+    ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& validationSet);
 
     void train(const std::function<void(long, double, double)> &callback);
     double test(const std::vector<std::pair<std::vector<double>, std::vector<double>>>& set) const;
+    void kFoldCrossValidation(const std::function<void (long, std::vector<double>, std::vector<double>)> &callback, const unsigned int k);
     void stopTraining() {m_stopTraining = true;}
 
     const std::vector<double>& feedForward(const std::vector<double>& dataInputs);
@@ -36,11 +40,12 @@ public:
 private:
     void importANN(const std::string& filepath);
     void createANN(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum);
+    void createANN(const ArtificialNeuralNetwork& ann);
 
     std::shared_ptr<ArtificialNeuralNetwork> m_ann;
 
     std::vector<std::pair<std::vector<double>, std::vector<double>>> m_trainingSet;
-    std::vector<std::pair<std::vector<double>, std::vector<double>>> m_testSet;
+    std::vector<std::pair<std::vector<double>, std::vector<double>>> m_validationSet;
 
     double m_error;
     bool m_stopTraining;

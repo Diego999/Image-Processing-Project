@@ -1,10 +1,12 @@
 #include "include/NeuralNetwork/anncontroller.h"
 #include "include/NeuralNetwork/artificialneuralnetwork.h"
+#include "include/Utils/utils.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cassert>
 
 #define DEFAULT_ERROR 0.001
 #define SPACE " "
@@ -15,16 +17,29 @@ ANNController::ANNController(int nbInputs, int nbOutputs, const std::vector<int>
     m_error = DEFAULT_ERROR;
 }
 
+ANNController::ANNController(const ArtificialNeuralNetwork& ann)
+{
+    createANN(ann);
+    m_error = DEFAULT_ERROR;
+}
+
+ANNController::ANNController(const ArtificialNeuralNetwork& ann ,const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& validationSet)
+    :ANNController(ann)
+{
+    m_trainingSet = trainingSet;
+    m_validationSet = validationSet;
+}
+
 ANNController::ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet) :
     ANNController(trainingSet[0].first.size(), trainingSet[0].second.size(), nbNeuronsPerHiddenLayer, learningRate, momentum)
 {
     m_trainingSet = trainingSet;
 }
 
-ANNController::ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet) :
+ANNController::ANNController(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& validationSet) :
     ANNController(nbNeuronsPerHiddenLayer, learningRate, momentum, trainingSet)
 {
-    m_testSet = testSet;
+    m_validationSet = validationSet;
 }
 
 ANNController::ANNController(const std::string& filepath):m_stopTraining(false)
@@ -39,16 +54,21 @@ ANNController::ANNController(const std::string& filepath, const std::vector<std:
     m_trainingSet = trainingSet;
 }
 
-ANNController::ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& testSet) :
+ANNController::ANNController(const std::string& filepath, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& trainingSet, const std::vector<std::pair<std::vector<double>, std::vector<double>>>& validationSet) :
     ANNController(filepath, trainingSet)
 {
-    m_testSet = testSet;
+    m_validationSet = validationSet;
+}
+
+void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>, std::vector<double>)> &callback, const unsigned int k)
+{
+    //TODO
 }
 
 void ANNController::train(const std::function<void(long, double, double)> &callback)
 {
     const size_t trainingQuantity = m_trainingSet.size();
-    const size_t testQuantity = m_testSet.size();
+    const size_t testQuantity = m_validationSet.size();
     size_t j;
     long iteration = 0L;
     double totalCurrentErrorTraining;
@@ -69,7 +89,7 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
         j = -1;
         while(++j < testQuantity)
         {
-            std::pair<std::vector<double>, std::vector<double>> test = m_testSet[j];
+            std::pair<std::vector<double>, std::vector<double>> test = m_validationSet[j];
             totalCurrentErrorTest += m_ann->validate(test.first, test.second);
         }
 
@@ -206,6 +226,12 @@ void ANNController::importANN(const std::string& filepath)
 void ANNController::createANN(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
 {
     m_ann = std::shared_ptr<ArtificialNeuralNetwork>(new ArtificialNeuralNetwork(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum));
+}
+
+void ANNController::createANN(const ArtificialNeuralNetwork& ann)
+{
+    m_ann = std::shared_ptr<ArtificialNeuralNetwork>(new ArtificialNeuralNetwork(ann));
+
 }
 
 std::string ANNController::log() const
