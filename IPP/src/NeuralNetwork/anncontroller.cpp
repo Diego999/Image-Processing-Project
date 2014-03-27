@@ -62,7 +62,56 @@ ANNController::ANNController(const std::string& filepath, const std::vector<std:
 
 void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>, std::vector<double>)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k)
 {
-    //TODO
+    assert(k >= 0);
+    std::vector<std::pair<std::vector<double>, std::vector<double>>> sets;
+    ipp_utils::mergeVectors(sets, {m_trainingSet, m_validationSet});
+
+    std::vector<std::vector<std::pair<std::vector<double>, std::vector<double>>>> samples = ipp_utils::createSubSamples(sets, k);
+
+    std::vector<ANNController> annControllers;
+    std::vector<double> errorTraining;
+    std::vector<double> errorValidation;
+    std::vector<std::shared_ptr<ArtificialNeuralNetwork>> anns;
+    for(unsigned int i = 0; i < k; ++i)
+    {
+        std::vector<std::pair<std::vector<double>, std::vector<double>>> trainingSet;
+        std::vector<std::pair<std::vector<double>, std::vector<double>>> validationSet(samples[i]);
+        for(unsigned int j = 0; j < k; ++j)
+            if(i!=j)
+                ipp_utils::mergeVectors(trainingSet, {samples[i]});
+        annControllers.push_back(ANNController(*m_ann, trainingSet, validationSet));
+        anns.push_back(annControllers.back().m_ann);
+        errorTraining.push_back(0.0);
+        errorValidation.push_back(0.0);
+    }
+
+    long iteration = 0L;
+    double errorTot;
+    m_stopTraining = false;
+    do
+    {
+        for(auto& e:errorTraining)
+            e = 0.0;
+        for(auto& e:errorValidation)
+            e = 0.0;
+        for(unsigned int i = 0; i < (sets.size()/k + sets.size()%k); ++i)
+        {
+            errorTot = 0.0;
+            for(auto& ann:annControllers)
+            {
+                if(i < ann.m_trainingSet.size())
+                    errorTraining[i] = ann.trainIteration(ann.m_trainingSet[i]);
+                if(i < ann.m_validationSet.size())
+                    errorValidation[i] = ann.validateIteration(ann.m_validationSet[i]);
+            }
+            callback(iteration, errorTraining, errorValidation);
+            ArtificialNeuralNetwork annNew(anns);
+            for(auto& s:sets)
+                errorTot += annNew.validate(s.first, s.second);
+            callbackFinalANN(iteration, errorTot);
+        }
+        ++iteration;
+    }while(errorTot >= m_error && !m_stopTraining);
 }
 
 void ANNController::train(const std::function<void(long, double, double)> &callback)
