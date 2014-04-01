@@ -3,13 +3,14 @@
 
 class SettingsNeuralNetwork
 {
-    static int nbInputs;
-    static int nbOutputs;
-    static int nbHiddenLayers;
-    static int nbNeuronsPerHiddenLayer;
+public:
+    static const int nbInputs;
+    static const int nbOutputs;
+    static const int nbHiddenLayers;
+    static const int nbNeuronsPerHiddenLayer;
 
-    static double learningRate;
-    static double momentum;
+    static const double learningRate;
+    static const double momentum;
 };
 
 #endif // SETTINGS_H
