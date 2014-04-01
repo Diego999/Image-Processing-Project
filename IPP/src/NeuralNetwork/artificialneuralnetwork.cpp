@@ -13,19 +13,19 @@ ArtificialNeuralNetwork::ArtificialNeuralNetwork(int nbInputs, int nbOutputs, co
     assert(nbNeuronsPerHiddenLayer.size() > 0);
 
     //First hidden layer
-    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(*m_nbNeuronsPerHiddenLayer.begin(), m_nbInputs)));
+    m_layers.push_back(std::make_shared<NeuronLayer>(*m_nbNeuronsPerHiddenLayer.begin(), m_nbInputs));
     m_inputs.push_back(std::vector<double>(m_nbInputs));
 
     for(auto it = m_nbNeuronsPerHiddenLayer.begin()+1; it != m_nbNeuronsPerHiddenLayer.end(); ++it)
     {
-        m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(*it, *(it-1))));
+        m_layers.push_back(std::make_shared<NeuronLayer>(*it, *(it-1)));
         m_inputs.push_back(std::vector<double>(*(it-1), 0));
     }
 
     m_inputs.push_back(std::vector<double>(*(m_nbNeuronsPerHiddenLayer.end()-1), 0));
 
     // Output layer. Output is considered as a layer, contrary to the inputs
-    m_layers.push_back(std::shared_ptr<NeuronLayer>(new NeuronLayer(m_nbOutputs, *(m_nbNeuronsPerHiddenLayer.end()-1))));
+    m_layers.push_back(std::make_shared<NeuronLayer>(m_nbOutputs, *(m_nbNeuronsPerHiddenLayer.end()-1)));
     m_inputs.push_back(std::vector<double>(m_nbOutputs, 0)); //To simplify the feedforward, the output of the ith-1 layer are the inputs of the ith layer. For the last layer (outputs), it is only outputs
 
     for(int i = 0; i < m_nbOutputs; ++i)

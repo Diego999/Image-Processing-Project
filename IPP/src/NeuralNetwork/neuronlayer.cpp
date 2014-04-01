@@ -7,7 +7,7 @@ NeuronLayer::NeuronLayer(int nbNeurons, int nbInputs):m_neurons(nbNeurons)
 {
     assert(nbNeurons > 0);
     for(int i = 0; i < nbNeurons; ++i)
-        m_neurons[i] = std::shared_ptr<Neuron>(new Neuron(nbInputs));
+        m_neurons[i] = std::make_shared<Neuron>(nbInputs);
 }
 
 NeuronLayer::~NeuronLayer()

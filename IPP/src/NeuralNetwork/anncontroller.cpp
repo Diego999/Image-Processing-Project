@@ -269,13 +269,12 @@ void ANNController::importANN(const std::string& filepath)
 
 void ANNController::createANN(int nbInputs, int nbOutputs, const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum)
 {
-    m_ann = std::shared_ptr<ArtificialNeuralNetwork>(new ArtificialNeuralNetwork(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum));
+    m_ann = std::make_shared<ArtificialNeuralNetwork>(nbInputs, nbOutputs, nbNeuronsPerHiddenLayer, learningRate, momentum);
 }
 
 void ANNController::createANN(const ArtificialNeuralNetwork& ann)
 {
-    m_ann = std::shared_ptr<ArtificialNeuralNetwork>(new ArtificialNeuralNetwork(ann));
-
+    m_ann = std::make_shared<ArtificialNeuralNetwork>(ann);
 }
 
 std::string ANNController::log() const
