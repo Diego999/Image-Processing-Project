@@ -21,7 +21,7 @@ public:
     void setTrainingSetPath(QString trainingSetPath);
     void setValidationSetPath(QString validationSetPath);
     void startTraining();
-    void feed(const std::vector<std::string>& filepaths);
+    std::vector<double> feed(const std::vector<std::string>& filepaths);
 
 private:
     std::vector<std::vector<double>> generateTargets(const std::vector<std::string> &) const;

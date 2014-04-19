@@ -7,6 +7,8 @@
 
 #include <tuple>
 #include <iostream>
+#include <cmath>
+
 #include <QMutex>
 
 #define BORDER 5
@@ -435,12 +437,16 @@ bool GraphicsScene::isDropAllow()
 
 void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
 {
-    m_ippController->feed(filepaths);
-    static std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths, true);
+    std::vector<double> results = m_ippController->feed(filepaths);
+    static std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths);
     QImage image = PictureController::create(pictures.back(), 32);
     QPixmap pixmap = QPixmap::fromImage(image).scaled(IMAGE_WIDHT, IMAGE_HEIGHT, Qt::IgnoreAspectRatio, Qt::FastTransformation);
     m_draggedImage.pixmap(pixmap);
     m_draggedImage.update();
+    if(results.back() < 0.5)
+        m_resultLabel.setText(tr("Open\nWith error: %1").arg(QString::number(fabs(results.back() - 0.1), 'g', 5)));
+    else
+        m_resultLabel.setText(tr("Sunglasses\nWith error: %1").arg(QString::number(fabs(0.9 - results.back()), 'g', 5)));
 }
 
 void GraphicsScene::createANN()

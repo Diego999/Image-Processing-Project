@@ -161,10 +161,12 @@ void IPPController::startTraining()
     }));
 }
 
-void IPPController::feed(const std::vector<std::string>& filepaths)
+std::vector<double> IPPController::feed(const std::vector<std::string>& filepaths)
 {
     std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths, true);
-    std::vector<std::vector<double>> results = annController->feedForward(pictures);
-    for(auto result : results)
-        std::cout << result[0] << std::endl;
+    std::vector<std::vector<double>> fullResults = annController->feedForward(pictures);
+    std::vector<double> results;
+    for(auto result : fullResults)
+        results.push_back(result[0]);
+    return results;
 }
