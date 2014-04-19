@@ -8,6 +8,8 @@
 #include <string>
 #include <cassert>
 
+#define OUT_DOUBLE(x) ((x < 1.0e-300) ? (x > -1.0e-300) ? 0.0 : x : x)
+
 #define DEFAULT_ERROR 0.001
 #define SPACE " "
 
@@ -198,18 +200,18 @@ void ANNController::exportANN(const std::string& filepath)
     file << m_ann->nbInputs() << SPACE << m_ann->nbOutputs() << SPACE << m_ann->nbHiddenLayers() << SPACE;
     for(auto& nbNeurons : m_ann->nbNeuronsPerHiddenLayer())
         file << nbNeurons << SPACE;
-    file << m_ann->learningRate() << SPACE << m_ann->momentum() << SPACE;
+    file << OUT_DOUBLE(m_ann->learningRate()) << SPACE << OUT_DOUBLE(m_ann->momentum()) << SPACE;
     for(int i = 0; i < m_ann->nbHiddenLayers() + 1; ++i)
     {
         int nbNeurons = (i < m_ann->nbHiddenLayers()) ? m_ann->nbNeuronsPerHiddenLayer()[i] : m_ann->nbOutputs();
         for(int j = 0; j < nbNeurons; ++j)
         {
             for(auto& weight : m_ann->weights(i,j))
-                file << weight << SPACE;
-            file << m_ann->threshold(i, j) << SPACE << m_ann->deltaNeuron(i, j) << SPACE;
+                file << OUT_DOUBLE(weight) << SPACE;
+            file << OUT_DOUBLE(m_ann->threshold(i, j)) << SPACE << OUT_DOUBLE(m_ann->deltaNeuron(i, j)) << SPACE;
             for(auto& prevWeight : m_ann->prevDeltaWeights(i,j))
-                file << prevWeight << SPACE;
-            file << m_ann->prevDeltaThreshold(i, j) << SPACE;
+                file << OUT_DOUBLE(prevWeight) << SPACE;
+            file << OUT_DOUBLE(m_ann->prevDeltaThreshold(i, j)) << SPACE;
         }
     }
     file.close();
