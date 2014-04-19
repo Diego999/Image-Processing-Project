@@ -7,3 +7,5 @@ const int SettingsNeuralNetwork::nbNeuronsPerHiddenLayer = 3;
 
 const double SettingsNeuralNetwork::learningRate = 0.1;
 const double SettingsNeuralNetwork::momentum = 0.3;
+
+std::string SettingsNeuralNetwork::extension = "ann";

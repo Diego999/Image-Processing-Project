@@ -15,11 +15,13 @@
 class ANNGraphics : public QwtPlot
 {
 public:
-    ANNGraphics(const std::vector<std::tuple<std::string, QPen, QwtSymbol*>>& curves, const std::string& titleX, const std::string& titleY);
-    ANNGraphics(const std::vector<std::tuple<std::string, QPen>>& curves, const std::string& titleX, const std::string& titleY);
+    ANNGraphics(const std::string& titleX, const std::string& titleY);
 
     void addPoints(const std::vector<std::vector<QPointF>>& points);
     void addPoint(const std::vector<QPointF>& point);
+
+    void addCurve(const std::tuple<std::string, QPen, QwtSymbol*>& curveData);
+    void addCurve(const std::tuple<std::string, QPen>& curveData);
 
 private:
     void initBasic(const std::string &titleX, const std::string &titleY);

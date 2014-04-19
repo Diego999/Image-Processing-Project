@@ -3,26 +3,8 @@
 #include <qwt_legend.h>
 #include <tuple>
 
-ANNGraphics::ANNGraphics(const std::vector<std::tuple<std::string, QPen, QwtSymbol*> > &curves, const std::string& titleX, const std::string& titleY)
+ANNGraphics::ANNGraphics(const std::string& titleX, const std::string& titleY)
 {
-    for(auto& tuple : curves)
-    {
-        std::shared_ptr<QwtPlotCurve> curve(new QwtPlotCurve(QString::fromStdString(std::get<0>(tuple))));
-        curve->setPen(std::get<1>(tuple));
-        curve->setSymbol(std::get<2>(tuple));
-        initLoop(curve);
-    }
-    initBasic(titleX, titleY);
-}
-
-ANNGraphics::ANNGraphics(const std::vector<std::tuple<std::string, QPen>>& curves, const std::string& titleX, const std::string& titleY)
-{
-    for(auto& tuple : curves)
-    {
-        std::shared_ptr<QwtPlotCurve> curve(new QwtPlotCurve(QString::fromStdString(std::get<0>(tuple))));
-        curve->setPen(std::get<1>(tuple));
-        initLoop(curve);
-    }
     initBasic(titleX, titleY);
 }
 
@@ -69,4 +51,19 @@ void ANNGraphics::addPoint(const std::vector<QPointF>& point)
         }
         this->replot();
     }
+}
+
+void ANNGraphics::addCurve(const std::tuple<std::string, QPen, QwtSymbol*>& curveData)
+{
+    std::shared_ptr<QwtPlotCurve> curve(new QwtPlotCurve(QString::fromStdString(std::get<0>(curveData))));
+    curve->setPen(std::get<1>(curveData));
+    curve->setSymbol(std::get<2>(curveData));
+    initLoop(curve);
+}
+
+void ANNGraphics::addCurve(const std::tuple<std::string, QPen>& curveData)
+{
+    std::shared_ptr<QwtPlotCurve> curve(new QwtPlotCurve(QString::fromStdString(std::get<0>(curveData))));
+    curve->setPen(std::get<1>(curveData));
+    initLoop(curve);
 }

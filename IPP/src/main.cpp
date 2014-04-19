@@ -7,18 +7,27 @@
 
 int main(int argc, char* argv[])
 {
-    // testsANN();
-    // testsANNController();
+    bool test = false;
+    if(test)
+    {
+        testsANN();
+        testsANNController();
 
-    QApplication app(argc, argv);
-    GraphicsScene scene(400, 300);
-    scene.createUI();
-    GraphicsView view(&scene);
-    view.show();
+        return 0;
+    }
+    else
+    {
+        const QSize size(800, 700);
+        QApplication app(argc, argv);
+        GraphicsScene scene(size);
+        scene.createUI();
+        GraphicsView view(&scene);
+        view.resize(size);
+        view.setFixedSize(size);
+        view.show();
 
+        IPPController ippc(scene);
 
-
-    IPPController ippc(scene);
-
-    return app.exec();
+        return app.exec();
+    }
 }

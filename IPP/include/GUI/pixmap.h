@@ -15,11 +15,16 @@ public:
 
     QRectF boundingRect() const
     {
-        return QRectF( QPointF(0, 0), p.size());
+        return QRectF( QPointF(0, 0), m_pixmap.size());
     }
 
+    void pixmap(const QPixmap& pixmap) { m_pixmap = pixmap; }
+
+    int width() const { return m_pixmap.width(); }
+    int height() const { return m_pixmap.height(); }
+
 private:
-    QPixmap p;
+    QPixmap m_pixmap;
 };
 
 #endif // PIXMAP_H

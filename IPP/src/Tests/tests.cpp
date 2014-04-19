@@ -96,6 +96,10 @@ void testsANNController()
     {
         std::cout << "iteration: " << iteration << " " << trainingError << " - " << testingError << std::endl;
     };
+    std::function<void(void)> didFinish = [&](void)
+    {
+        std::cout << "[Training finished]" << std::endl;
+    };
     std::vector<std::vector<double>> validationSets;
 
     validationSets.push_back({0,0});
@@ -103,7 +107,7 @@ void testsANNController()
     validationSets.push_back({1,0});
     validationSets.push_back({1,1});
 
-    annc->train(callback);
+    annc->train(callback, didFinish);
     annc->exportANN(filepath);
     for(auto& result : annc->feedForward(validationSets))
         std::cout << result[0] << std::endl;

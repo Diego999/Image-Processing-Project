@@ -43,7 +43,8 @@ SOURCES += src/main.cpp \
     src/GUI/graphicsscene.cpp \
     src/GUI/pixmap.cpp \
     src/GUI/anngraphics.cpp \
-    src/Controller/ippcontroller.cpp
+    src/Controller/ippcontroller.cpp \
+    src/GUI/pushbutton.cpp
 
 HEADERS += \
     include/Utils/utils.h \
@@ -58,4 +59,15 @@ HEADERS += \
     include/GUI/graphicsscene.h \
     include/GUI/pixmap.h \
     include/GUI/anngraphics.h \
-    include/Controller/ippcontroller.h
+    include/Controller/ippcontroller.h \
+    include/GUI/pushbutton.h
+
+RESOURCES += \
+    resources.qrc
+
+OTHER_FILES += \
+    resources/images/bg1.png \
+    resources/images/bg2.png \
+    resources/images/bg3.png \
+    resources/images/bg4.png \
+    resources/images/draghere.png

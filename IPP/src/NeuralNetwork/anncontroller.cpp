@@ -120,7 +120,7 @@ void ANNController::kFoldCrossValidation(const std::function<void (long, std::ve
     }while(errorTot >= m_error && !m_stopTraining);
 }
 
-void ANNController::train(const std::function<void(long, double, double)> &callback)
+void ANNController::train(const std::function<void(long, double, double)> &callback, const std::function<void(void)>& didFinish)
 {
     long iteration = 0L;
     double totalCurrentErrorTraining, totalCurrentErrorTest;
@@ -134,8 +134,9 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
         j = -1;
         while(++j < m_validationSet.size())
             totalCurrentErrorTest += validateIteration(m_validationSet[j]);
-        callback(iteration++, totalCurrentErrorTraining, totalCurrentErrorTest);
+        callback(iteration++, totalCurrentErrorTraining, j == 0 ? -1 : totalCurrentErrorTest);
     } while(totalCurrentErrorTraining >= m_error && !m_stopTraining);
+    didFinish();
 }
 
 double ANNController::trainIteration(const std::pair<std::vector<double>, std::vector<double>>& set)

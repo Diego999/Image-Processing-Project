@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="bg1">resources/images/bg1.png</file>
+        <file alias="bg2">resources/images/bg2.png</file>
+        <file alias="bg3">resources/images/bg3.png</file>
+        <file alias="bg4">resources/images/bg4.png</file>
+        <file alias="draghere">resources/images/draghere.png</file>
+    </qresource>
+</RCC>
