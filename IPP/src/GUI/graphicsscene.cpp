@@ -463,9 +463,8 @@ bool GraphicsScene::isDropAllow()
 void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
 {
     std::vector<double> results = m_ippController->feed(filepaths);
-    static std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths);
-    QImage image = PictureController::create(pictures.back(), 32);
-    QPixmap pixmap = QPixmap::fromImage(image).scaled(IMAGE_WIDHT, IMAGE_HEIGHT, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths);
+    QPixmap pixmap = QPixmap::fromImage(PictureController::create(pictures.back(), 32)).scaled(IMAGE_WIDHT, IMAGE_HEIGHT, Qt::IgnoreAspectRatio, Qt::FastTransformation);
     m_draggedImage.pixmap(pixmap);
     m_draggedImage.update();
     if(results.back() < 0.5)
