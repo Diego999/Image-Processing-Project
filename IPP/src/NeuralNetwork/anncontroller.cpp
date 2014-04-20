@@ -62,7 +62,7 @@ ANNController::ANNController(const std::string& filepath, const std::vector<std:
     m_validationSet = validationSet;
 }
 
-void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>&, std::vector<double>&)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k)
+void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>&, std::vector<double>&)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k, const std::function<void(void)>& didFinish)
 {
     assert(k >= 0);
     std::vector<std::pair<std::vector<double>, std::vector<double>>> sets;
@@ -112,7 +112,7 @@ void ANNController::kFoldCrossValidation(const std::function<void (long, std::ve
             ++k;
         }
 
-        callback(iteration++, errorTraining, errorValidation);
+        callback(++iteration, errorTraining, errorValidation);
 
         errorTot = 0.0;
         for(auto& s:sets)
@@ -120,6 +120,7 @@ void ANNController::kFoldCrossValidation(const std::function<void (long, std::ve
 
         callbackFinalANN(iteration, errorTot);
     }while(errorTot >= m_error && !m_stopTraining);
+    didFinish();
 }
 
 void ANNController::train(const std::function<void(long, double, double)> &callback, const std::function<void(void)>& didFinish)

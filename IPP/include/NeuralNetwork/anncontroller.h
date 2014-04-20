@@ -23,7 +23,7 @@ public:
 
     void train(const std::function<void(long, double, double)> &callback, const std::function<void(void)> &didFinish);
     double test(const std::vector<std::pair<std::vector<double>, std::vector<double>>>& set) const;
-    void kFoldCrossValidation(const std::function<void (long, std::vector<double>&, std::vector<double>&)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k);
+    void kFoldCrossValidation(const std::function<void (long, std::vector<double>&, std::vector<double>&)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k, const std::function<void(void)>& didFinish);
     void stopTraining() {m_stopTraining = true;}
 
     const std::vector<double>& feedForward(const std::vector<double>& dataInputs);

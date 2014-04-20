@@ -179,7 +179,7 @@ void testKFoldCrossValidation()
         {
             std::cout << "\t" << i << " " << err << std::endl << std::endl;
         },
-    2
+    2, 0
     );
 
 }

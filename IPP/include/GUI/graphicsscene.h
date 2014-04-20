@@ -22,6 +22,7 @@ public:
 
     void createUI();
     void addPoint(const std::vector<QPointF>& points);
+    void addPointKFoldCrossValidation(const std::vector<std::vector<QPointF>>& points);
 
     void ippController(IPPController* ippController) { m_ippController = ippController; }
 
@@ -53,6 +54,7 @@ private:
     QTimer *m_timer;
     ANNGraphics m_annGraphics;
     QQueue<std::vector<QPointF>> m_futurePoints;
+    QQueue<std::vector<std::vector<QPointF>>> m_futurePointsKFoldCrossValidation;
     QMutex m_mutex;
     PushButton m_newButton;
     PushButton m_importButton;
@@ -70,7 +72,9 @@ private:
     Pixmap m_bg4;
     Pixmap m_draggedImage;
     qint32 m_currentState;
+    unsigned int m_k;
     bool m_finished;
+    bool m_kFoldCrossValidation;
 
     void stateChange();
 

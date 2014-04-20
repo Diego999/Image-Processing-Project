@@ -400,11 +400,29 @@ void GraphicsScene::createUI()
 void GraphicsScene::checkStatus()
 {
     m_mutex.lock();
-    if(!m_futurePoints.isEmpty())
+    if(m_kFoldCrossValidation)
     {
-        std::vector<QPointF> points = m_futurePoints.dequeue();
-        m_annGraphics.addPoint(points);
-        m_errorsLabel.setText(GraphicsScene::formatErrorsLabel(points));
+        if(!m_futurePointsKFoldCrossValidation.isEmpty())
+        {
+            qDebug() << "add to graph";
+            std::vector<std::vector<QPointF>> points = m_futurePointsKFoldCrossValidation.dequeue();
+            m_annGraphics.addPointKFoldCrossValidation(points);
+        }
+        if(!m_futurePoints.isEmpty())
+        {
+            std::vector<QPointF> points = m_futurePoints.dequeue();
+            m_annGraphics.addPoint(points);
+            m_errorsLabel.setText(GraphicsScene::formatErrorsLabel(points));
+        }
+    }
+    else
+    {
+        if(!m_futurePoints.isEmpty())
+        {
+            std::vector<QPointF> points = m_futurePoints.dequeue();
+            m_annGraphics.addPoint(points);
+            m_errorsLabel.setText(GraphicsScene::formatErrorsLabel(points));
+        }
     }
     // Enable next button if training is finished
     if(m_finished)
@@ -419,6 +437,13 @@ void GraphicsScene::addPoint(const std::vector<QPointF>& points)
 {
     m_mutex.lock();
     m_futurePoints.enqueue(points);
+    m_mutex.unlock();
+}
+
+void GraphicsScene::addPointKFoldCrossValidation(const std::vector<std::vector<QPointF>>& points)
+{
+    m_mutex.lock();
+    m_futurePointsKFoldCrossValidation.enqueue(points);
     m_mutex.unlock();
 }
 
@@ -489,6 +514,17 @@ void GraphicsScene::createANN()
     QString errorLabel = tr("Error");
     form.addRow(errorLabel, &errorSpinBox);
 
+    QCheckBox kFoldCrossValidationCheckbox(tr("kFoldCrossValidation"), &dialog);
+    form.addRow(&kFoldCrossValidationCheckbox);
+
+    QSpinBox kSpinBox(&dialog);
+    kSpinBox.setValue(5);
+    kSpinBox.setMinimum(1);
+    kSpinBox.setMaximum(500);
+    kSpinBox.setSingleStep(kSpinBox.minimum());
+    QString kLabel = tr("k");
+    form.addRow(kLabel, &kSpinBox);
+
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     form.addRow(&buttonBox);
     QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
@@ -504,7 +540,9 @@ void GraphicsScene::createANN()
                 neurons++;
             nbNeuronsPerHiddenLayer.push_back(neurons);
         }
-        m_ippController->configANN(nbNeuronsPerHiddenLayer, learningRateSpinBox.value(), momentumSpinBox.value(), errorSpinBox.value());
+        m_ippController->configANN(nbNeuronsPerHiddenLayer, learningRateSpinBox.value(), momentumSpinBox.value(), errorSpinBox.value(), kFoldCrossValidationCheckbox.isChecked(), kSpinBox.value());
+        m_kFoldCrossValidation = kFoldCrossValidationCheckbox.isChecked();
+        m_k = kSpinBox.value();
         emit goToNextState();
     }
 }
@@ -546,7 +584,7 @@ void GraphicsScene::selectTrainingSet()
                                                     tr(QString("Training Set (*)").toStdString().c_str()));
     if(!fileName.isNull())
     {
-        m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)));
+        m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
         m_ippController->setTrainingSetPath(fileName);
         m_startTrainingButton.setVisible(true);
     }

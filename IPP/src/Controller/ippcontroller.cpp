@@ -78,12 +78,14 @@ void IPPController::exportANN(QString annPath)
     annController->exportANN(annPath.toStdString());;
 }
 
-void IPPController::configANN(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, double error)
+void IPPController::configANN(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, double error, bool kFoldCrossValidation, unsigned int k)
 {
      m_nbNeuronsPerHiddenLayer = nbNeuronsPerHiddenLayer;
      m_learningRate = learningRate;
      m_momentum = momentum;
      m_error = error;
+     m_kFoldCrossValidation = kFoldCrossValidation;
+     m_k = k;
 }
 
 void IPPController::setTrainingSetPath(QString trainingSetPath)
@@ -142,23 +144,53 @@ void IPPController::startTraining()
 
     annController->error(m_error);
 
-    std::function<void(long, double, double)> callback = [&](long iteration, double trainingError, double testingError)
-    {
-        if(testingError < 0)
-            m_graphicsScene->addPoint({QPointF(iteration,trainingError)});
-        else
-            m_graphicsScene->addPoint({QPointF(iteration,trainingError), QPointF(iteration,testingError)});
-    };
-
     std::function<void(void)> didFinish = [&](void)
     {
         m_graphicsScene->trainingDidFinish();
     };
 
-    std::cout << "[Training start]" << std::endl;
-    thread = std::shared_ptr<std::thread>(new std::thread([=](){
-        annController->train(callback, didFinish);
-    }));
+    if(m_kFoldCrossValidation)
+    {
+        std::function<void(long, std::vector<double>&, std::vector<double>&)> callback = [&](long i, std::vector<double> &errT, std::vector<double>& errV)
+        {
+            std::vector<std::vector<QPointF>> points;
+            auto it1 = errT.begin();
+            auto it2 = errV.begin();
+
+            while(it1 != errT.end() && it2 != errV.end())
+            {
+                points.push_back({QPointF(i, *it1), QPointF(i, *it2)});
+                ++it1;
+                ++it2;
+            }
+            m_graphicsScene->addPointKFoldCrossValidation(points);
+            std::cout << i << std::endl;
+        };
+        std::function<void(long, double)> callbackFinalANN = [&](long i, double err)
+            {
+                m_graphicsScene->addPoint({QPointF(i, err)});
+            };
+
+        std::cout << "[Training start]" << std::endl;
+        thread = std::shared_ptr<std::thread>(new std::thread([=](){
+            annController->kFoldCrossValidation(callback, callbackFinalANN, m_k, didFinish);
+        }));
+    }
+    else
+    {
+        std::function<void(long, double, double)> callback = [&](long iteration, double trainingError, double testingError)
+        {
+            if(testingError < 0)
+                m_graphicsScene->addPoint({QPointF(iteration,trainingError)});
+            else
+                m_graphicsScene->addPoint({QPointF(iteration,trainingError), QPointF(iteration,testingError)});
+        };
+
+        std::cout << "[Training start]" << std::endl;
+        thread = std::shared_ptr<std::thread>(new std::thread([=](){
+            annController->train(callback, didFinish);
+        }));
+    }
 }
 
 std::vector<double> IPPController::feed(const std::vector<std::string>& filepaths)
