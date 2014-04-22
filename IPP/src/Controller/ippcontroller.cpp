@@ -100,7 +100,7 @@ void IPPController::setTrainingSetPath(QString trainingSetPath)
 
     QTextStream in(&file);
     while (!in.atEnd())
-        currentFilePaths.push_back(in.readLine().toStdString());
+        currentFilePaths.push_back(QFileInfo(trainingSetPath).absoluteDir().absolutePath().toStdString()+in.readLine().toStdString());
 
     std::vector<std::vector<double>> inputsTrainingSet = PictureController::loadPictures(currentFilePaths);
     std::vector<std::vector<double>> targetsTrainingSet = generateTargets(currentFilePaths);
@@ -122,7 +122,7 @@ void IPPController::setValidationSetPath(QString validationSetPath)
 
     QTextStream in(&file);
     while (!in.atEnd())
-        currentFilePaths.push_back(in.readLine().toStdString());
+        currentFilePaths.push_back(QFileInfo(validationSetPath).absoluteDir().absolutePath().toStdString()+in.readLine().toStdString());
 
     std::vector<std::vector<double>> inputsValidationSet = PictureController::loadPictures(currentFilePaths);
     std::vector<std::vector<double>> targetsValidationSet = generateTargets(currentFilePaths);
