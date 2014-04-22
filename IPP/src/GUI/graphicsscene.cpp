@@ -21,6 +21,8 @@
 #define IMAGE_HEIGHT 300
 
 GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.width(), size.height()),
+    // the graphics
+    m_annGraphics("Number of iterations", "Error"),
     // Text edit and button
     m_newButton(tr("New")),
     m_importButton(tr("Import")),
@@ -30,8 +32,6 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
     m_startTrainingButton(tr("Start training")),
     m_nextButton("->"),
     m_backButton("<-"),
-    // the graphics
-    m_annGraphics("Number of iterations", "Error"),
     //the backgrounds
     m_bg1(QPixmap(":images/bg1")),
     m_bg2(QPixmap(":images/bg2")),
@@ -488,26 +488,26 @@ void GraphicsScene::createANN()
     form.addRow(hiddenLayerLabel, &hiddenLayerLineEdit);
 
     QDoubleSpinBox learningRateSpinBox(&dialog);
-    learningRateSpinBox.setValue(0.5D);
-    learningRateSpinBox.setMinimum(0.001D);
-    learningRateSpinBox.setMaximum(1.0D);
+    learningRateSpinBox.setValue(0.5);
+    learningRateSpinBox.setMinimum(0.001);
+    learningRateSpinBox.setMaximum(1.0);
     learningRateSpinBox.setSingleStep(learningRateSpinBox.minimum());
     learningRateSpinBox.setDecimals(3);
     QString learningRateLabel = tr("Learning rate");
     form.addRow(learningRateLabel, &learningRateSpinBox);
 
     QDoubleSpinBox momentumSpinBox(&dialog);
-    momentumSpinBox.setValue(0.5D);
-    momentumSpinBox.setMinimum(0.001D);
-    momentumSpinBox.setMaximum(1.0D);
+    momentumSpinBox.setValue(0.5);
+    momentumSpinBox.setMinimum(0.001);
+    momentumSpinBox.setMaximum(1.0);
     momentumSpinBox.setSingleStep(momentumSpinBox.minimum());
     momentumSpinBox.setDecimals(3);
     QString momentumLabel = tr("Momentum");
     form.addRow(momentumLabel, &momentumSpinBox);
 
     QDoubleSpinBox errorSpinBox(&dialog);
-    errorSpinBox.setValue(0.0001D);
-    errorSpinBox.setMinimum(0.00001D);
+    errorSpinBox.setValue(0.0001);
+    errorSpinBox.setMinimum(0.00001);
     errorSpinBox.setSingleStep(errorSpinBox.minimum());
     errorSpinBox.setDecimals(5);
     QString errorLabel = tr("Error");
