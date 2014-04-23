@@ -206,7 +206,6 @@ void IPPController::reset()
 {
     if(m_annController == nullptr) return;
     m_annController->stopTraining();
-    while(m_annController->isTraining()) ;
-    m_annController.reset();
     thread->join();
+    m_annController.reset();
 }
