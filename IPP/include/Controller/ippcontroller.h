@@ -18,8 +18,8 @@ public:
     void importANN(QString annPath);
     void exportANN(QString annPath);
     void configANN(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, double error, bool kFoldCrossValidation, unsigned int k);
-    void setTrainingSetPath(QString trainingSetPath);
-    void setValidationSetPath(QString validationSetPath);
+    int setTrainingSetPath(QString trainingSetPath);
+    int setValidationSetPath(QString validationSetPath);
     void startTraining();
     std::vector<double> feed(const std::vector<std::string>& filepaths);
     static const std::vector<std::vector<double>> generateTargets(const std::vector<std::string>& filepaths);

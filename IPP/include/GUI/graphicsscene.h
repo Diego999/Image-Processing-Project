@@ -58,6 +58,8 @@ private:
     unsigned int m_k;
     bool m_finished;
     bool m_kFoldCrossValidation;
+    int m_trainingQuantity;
+    int m_validationQuantity;
 
     QTimer *m_timer;
 
@@ -85,7 +87,7 @@ private:
 
     void stateChange();
 
-    static QString formatErrorsLabel(const std::vector<QPointF>& points);
+    QString formatErrorsLabel(const std::vector<QPointF>& points);
 };
 
 #endif // GRAPHICSSCENE_H

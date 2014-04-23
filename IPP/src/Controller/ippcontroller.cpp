@@ -88,14 +88,14 @@ void IPPController::configANN(const std::vector<int>& nbNeuronsPerHiddenLayer, d
      m_k = k;
 }
 
-void IPPController::setTrainingSetPath(QString trainingSetPath)
+int IPPController::setTrainingSetPath(QString trainingSetPath)
 {
     std::vector<std::string> currentFilePaths;
     QFile file(trainingSetPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         std::cout << "[Can't open file] -> " << trainingSetPath.toStdString() << std::endl;
-        return;
+        return 0;
     }
 
     QTextStream in(&file);
@@ -108,16 +108,18 @@ void IPPController::setTrainingSetPath(QString trainingSetPath)
     m_trainingSet.clear();
     for(size_t i = 0; i < inputsTrainingSet.size(); ++i)
         m_trainingSet.push_back({inputsTrainingSet[i], targetsTrainingSet[i]});
+
+    return m_trainingSet.size();
 }
 
-void IPPController::setValidationSetPath(QString validationSetPath)
+int IPPController::setValidationSetPath(QString validationSetPath)
 {
     std::vector<std::string> currentFilePaths;
     QFile file(validationSetPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         std::cout << "[Can't open file] -> " << validationSetPath.toStdString() << std::endl;
-        return;
+        return 0;
     }
 
     QTextStream in(&file);
@@ -130,6 +132,8 @@ void IPPController::setValidationSetPath(QString validationSetPath)
     m_validationSet.clear();
     for(size_t i = 0; i < inputsValidationSet.size(); ++i)
         m_validationSet.push_back({inputsValidationSet[i], targetsValidationSet[i]});
+
+    return m_validationSet.size();
 }
 
 void IPPController::startTraining()
@@ -208,4 +212,6 @@ void IPPController::reset()
     m_annController->stopTraining();
     thread->join();
     m_annController.reset();
+    m_trainingSet.clear();
+    m_validationSet.clear();
 }

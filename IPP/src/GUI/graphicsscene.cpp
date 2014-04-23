@@ -46,9 +46,9 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
 {
     setBackgroundBrush(this->palette().window());
     m_errorsLabel.setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
-    m_errorsLabel.resize(220, 64); // Values from test
+    m_errorsLabel.resize(350, 64); // Values from test
     m_resultLabel.setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
-    m_resultLabel.resize(IMAGE_WIDHT, 64); // Values from test
+    m_resultLabel.resize(IMAGE_WIDHT + 20, 64); // Values from test
 }
 
 void GraphicsScene::createUI()
@@ -426,7 +426,7 @@ void GraphicsScene::checkStatus()
         {
             std::vector<QPointF> points = m_futurePoints.dequeue();
             m_annGraphics.addPoint(points);
-            m_errorsLabel.setText(GraphicsScene::formatErrorsLabel(points));
+            m_errorsLabel.setText(formatErrorsLabel(points));
         }
     }
     else
@@ -435,7 +435,7 @@ void GraphicsScene::checkStatus()
         {
             std::vector<QPointF> points = m_futurePoints.dequeue();
             m_annGraphics.addPoint(points);
-            m_errorsLabel.setText(GraphicsScene::formatErrorsLabel(points));
+            m_errorsLabel.setText(formatErrorsLabel(points));
         }
     }
     // Enable next button if training is finished
@@ -464,9 +464,19 @@ void GraphicsScene::addPointKFoldCrossValidation(const std::vector<std::vector<Q
 QString GraphicsScene::formatErrorsLabel(const std::vector<QPointF>& points)
 {
     if(points.size() > 1)
-        return tr("Iteration: %1\nTraining Set Error: %2\nValidation Set Error: %3").arg(QString::number(points[0].x()), QString::number(points[0].y(), 'g', 5), QString::number(points[1].y(), 'g', 5));
+        return tr("Iteration: %1\nTraining Set Error: %2 (mean: %3)\nValidation Set Error: %4 (mean: %5)").arg(
+                    QString::number(points[0].x()),
+                    QString::number(points[0].y(), 'g', 5),
+                    QString::number(points[0].y() / m_trainingQuantity, 'g', 5),
+                    QString::number(points[1].y(), 'g', 5),
+                    QString::number(points[1].y() / m_validationQuantity, 'g', 5)
+                );
     else
-        return tr("Iteration: %1\nTraining Set Error: %2").arg(QString::number(points[0].x()), QString::number(points[0].y(), 'g', 5));
+        return tr("Iteration: %1\nTraining Set Error: %2 (mean: %3)").arg(
+                    QString::number(points[0].x()),
+                    QString::number(points[0].y(), 'g', 5),
+                    QString::number(points[0].y() / m_trainingQuantity, 'g', 5)
+                );
 }
 
 bool GraphicsScene::isDropAllow()
@@ -505,14 +515,14 @@ void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
     if(sunglassesDetected)
         m_resultLabel.setText(tr("Sunglasses\nWith error: %1\n%2% dragged found with %3 mean error")
                               .arg(QString::number(fabs(0.9 - results.back()), 'g', 5),
-                                   QString::number(errorTotal / filepaths.size() * 100, 'g', 2),
-                                   QString::number(correctFound / (double)filepaths.size(), 'g', 5)
+                                   QString::number(correctFound / (double)filepaths.size() * 100, 'g', 3),
+                                   QString::number(errorTotal / filepaths.size(), 'g', 5)
                                    ));
     else
         m_resultLabel.setText(tr("Open\nWith error: %1\n%2% dragged found with %3 mean error")
-                              .arg(QString::number(fabs(results.back() - 0.1), 'g', 5),
-                                   QString::number(100/*errorTotal / filepaths.size() * 100*/, 'g', 2),
-                                   QString::number(correctFound / (double)filepaths.size(), 'g', 5)
+                              .arg(QString::number(fabs(0.1 - results.back()), 'g', 5),
+                                   QString::number(correctFound / (double)filepaths.size() * 100, 'g', 3),
+                                   QString::number(errorTotal / filepaths.size(), 'g', 5)
                                    ));
 
     bool sunglasses = targets.back().back() > 0.5;
@@ -633,7 +643,7 @@ void GraphicsScene::selectTrainingSet()
                                                     tr(QString("Training Set (*)").toStdString().c_str()));
     if(!fileName.isNull())
     {
-        m_ippController->setTrainingSetPath(fileName);
+        m_trainingQuantity = m_ippController->setTrainingSetPath(fileName);
         m_startTrainingButton.setVisible(true);
     }
 }
@@ -646,7 +656,7 @@ void GraphicsScene::selectValidationSet()
                                                     tr(QString("Validation Set (*)").toStdString().c_str()));
     if(!fileName.isNull())
     {
-        m_ippController->setValidationSetPath(fileName);
+        m_validationQuantity = m_ippController->setValidationSetPath(fileName);
     }
 }
 
