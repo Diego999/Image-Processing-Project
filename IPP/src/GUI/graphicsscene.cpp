@@ -478,22 +478,46 @@ bool GraphicsScene::isDropAllow()
 
 void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
 {
-    bool sunglasses = IPPController::generateTargets(filepaths).back().back() > 0.5;
+    std::vector<std::vector<double>> targets = IPPController::generateTargets(filepaths);
     std::vector<double> results = m_ippController->feed(filepaths);
-    std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths);
+
+    auto targetsIterator = targets.cbegin();
+    auto resultsIterator = results.cbegin();
+    double errorTotal = 0.0;
+    int correctFound = 0;
+    while(targetsIterator != targets.cend() && resultsIterator != results.cend())
+    {
+        if(((*targetsIterator).back() < 0.5 && *resultsIterator < 0.5) || ((*targetsIterator).back() >= 0.5 && *resultsIterator >= 0.5))
+            correctFound++;
+        errorTotal += fabs((*targetsIterator).back() - *resultsIterator);
+        ++targetsIterator;
+        ++resultsIterator;
+    }
+
     std::string filepath = filepaths.back();
+    std::vector<std::vector<double>> pictures = PictureController::loadPictures({filepath});
     filepath.replace(filepath.end()-6, filepath.end()-4,"");
     bool highQualityFileExist = QFile(QString::fromStdString(filepath)).exists();
     std::vector<double> picture = highQualityFileExist ? PictureController::loadPictures({filepath}).back() : pictures.back();
     QPixmap pixmap = QPixmap::fromImage(PictureController::create(picture, 32 * (highQualityFileExist ? 4 : 1))).scaled(IMAGE_WIDHT, IMAGE_HEIGHT, Qt::IgnoreAspectRatio, Qt::FastTransformation);
     m_draggedImage.pixmap(pixmap);
     m_draggedImage.update();
+
     bool sunglassesDetected = results.back() > 0.5;
     if(sunglassesDetected)
-        m_resultLabel.setText(tr("Sunglasses\nWith error: %1").arg(QString::number(fabs(0.9 - results.back()), 'g', 5)));
+        m_resultLabel.setText(tr("Sunglasses\nWith error: %1\n%2% dragged found with %3 mean error")
+                              .arg(QString::number(fabs(0.9 - results.back()), 'g', 5),
+                                   QString::number(errorTotal / filepaths.size() * 100, 'g', 2),
+                                   QString::number(correctFound / (double)filepaths.size(), 'g', 5)
+                                   ));
     else
-        m_resultLabel.setText(tr("Open\nWith error: %1").arg(QString::number(fabs(results.back() - 0.1), 'g', 5)));
+        m_resultLabel.setText(tr("Open\nWith error: %1\n%2% dragged found with %3 mean error")
+                              .arg(QString::number(fabs(results.back() - 0.1), 'g', 5),
+                                   QString::number(100/*errorTotal / filepaths.size() * 100*/, 'g', 2),
+                                   QString::number(correctFound / (double)filepaths.size(), 'g', 5)
+                                   ));
 
+    bool sunglasses = targets.back().back() > 0.5;
     bool success = sunglasses == sunglassesDetected;
     m_resultImage.pixmap(success ? m_successImage : m_errorImage);
     m_resultImage.setVisible(true);
