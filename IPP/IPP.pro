@@ -70,4 +70,6 @@ OTHER_FILES += \
     resources/images/bg2.png \
     resources/images/bg3.png \
     resources/images/bg4.png \
-    resources/images/draghere.png
+    resources/images/draghere.png \
+    resources/images/error.png \
+    resources/images/success.png

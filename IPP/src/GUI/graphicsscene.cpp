@@ -23,6 +23,8 @@
 GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.width(), size.height()),
     // the graphics
     m_annGraphics("Number of iterations", "Error"),
+    m_successImage(":images/success"),
+    m_errorImage(":images/error"),
     // Text edit and button
     m_newButton(tr("New")),
     m_importButton(tr("Import")),
@@ -38,6 +40,7 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
     m_bg3(QPixmap(":images/bg3")),
     m_bg4(QPixmap(":images/bg4")),
     m_draggedImage(QPixmap(":images/draghere")),
+    m_resultImage(m_successImage),
     m_currentState(0),
     m_finished(false)
 {
@@ -118,6 +121,9 @@ void GraphicsScene::createUI()
     addItem(errorsLabelProxy);
     addItem(resultsLabelProxy);
 
+    addItem(&m_resultImage);
+    m_resultImage.setVisible(false);
+
     addItem(annGraphicsProxy);
 
     QStateMachine *machine = new QStateMachine;
@@ -154,6 +160,7 @@ void GraphicsScene::createUI()
     stateStart->assignProperty(exportButtonProxy, "pos", QPointF(3 * width + width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
     stateStart->assignProperty(&m_draggedImage, "pos", QPointF(3 * width + width / 2 - m_draggedImage.width() / 2, height / 2 - m_draggedImage.height() / 2));
     stateStart->assignProperty(resultsLabelProxy, "pos", QPointF(3 * width + width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateStart->assignProperty(&m_resultImage, "pos", QPointF(3 * width + width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
 
     stateStart->assignProperty(&m_bg1, "opacity", qreal(1));
     stateStart->assignProperty(&m_bg2, "opacity", qreal(0));
@@ -178,6 +185,7 @@ void GraphicsScene::createUI()
     stateSets->assignProperty(exportButtonProxy, "pos", QPointF(2 * width + width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
     stateSets->assignProperty(&m_draggedImage, "pos", QPointF(2 * width + width / 2 - m_draggedImage.width() / 2, height / 2 - m_draggedImage.height() / 2));
     stateSets->assignProperty(resultsLabelProxy, "pos", QPointF(2 * width + width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateSets->assignProperty(&m_resultImage, "pos", QPointF(2 * width + width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
 
     stateSets->assignProperty(&m_bg1, "opacity", qreal(0));
     stateSets->assignProperty(&m_bg2, "opacity", qreal(1));
@@ -202,6 +210,7 @@ void GraphicsScene::createUI()
     stateTesting->assignProperty(exportButtonProxy, "pos", QPointF(width + width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
     stateTesting->assignProperty(&m_draggedImage, "pos", QPointF(width + width / 2 - m_draggedImage.width() / 2, height / 2 - m_draggedImage.height() / 2));
     stateTesting->assignProperty(resultsLabelProxy, "pos", QPointF(width + width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateTesting->assignProperty(&m_resultImage, "pos", QPointF(width + width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
 
     stateTesting->assignProperty(&m_bg1, "opacity", qreal(0));
     stateTesting->assignProperty(&m_bg2, "opacity", qreal(0));
@@ -227,6 +236,7 @@ void GraphicsScene::createUI()
     stateMain->assignProperty(exportButtonProxy, "pos", QPointF(width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
     stateMain->assignProperty(&m_draggedImage, "pos", QPointF(width / 2 - m_draggedImage.width() / 2, height / 2 - m_draggedImage.height() / 2));
     stateMain->assignProperty(resultsLabelProxy, "pos", QPointF(width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateMain->assignProperty(&m_resultImage, "pos", QPointF(width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
 
     stateMain->assignProperty(&m_bg1, "opacity", qreal(0));
     stateMain->assignProperty(&m_bg2, "opacity", qreal(0));
@@ -259,6 +269,7 @@ void GraphicsScene::createUI()
     t1->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
     t1->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
     t1->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t1->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
     QAbstractTransition *t2 = stateSets->addTransition(this, SIGNAL(goToPreviousState()), stateStart);
     t2->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
@@ -285,6 +296,7 @@ void GraphicsScene::createUI()
     t2->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
     t2->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
     t2->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t2->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
     QAbstractTransition *t3 = stateSets->addTransition(this, SIGNAL(goToNextState()), stateTesting);
     t3->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
@@ -311,6 +323,7 @@ void GraphicsScene::createUI()
     t3->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
     t3->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
     t3->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t3->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
     QAbstractTransition *t6 = stateTesting->addTransition(this, SIGNAL(goToPreviousState()), stateSets);
     t6->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
@@ -337,6 +350,7 @@ void GraphicsScene::createUI()
     t6->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
     t6->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
     t6->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t6->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
     QAbstractTransition *t7 = stateTesting->addTransition(this, SIGNAL(goToNextState()), stateMain);
     t7->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
@@ -363,6 +377,7 @@ void GraphicsScene::createUI()
     t7->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
     t7->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
     t7->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t7->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
     QAbstractTransition *t8 = stateMain->addTransition(this, SIGNAL(goToPreviousState()), stateTesting);
     t8->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
@@ -389,6 +404,7 @@ void GraphicsScene::createUI()
     t8->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
     t8->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
     t8->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t8->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
     machine->start();
 
@@ -462,15 +478,26 @@ bool GraphicsScene::isDropAllow()
 
 void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
 {
+    bool sunglasses = IPPController::generateTargets(filepaths).back().back() > 0.5;
     std::vector<double> results = m_ippController->feed(filepaths);
     std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths);
-    QPixmap pixmap = QPixmap::fromImage(PictureController::create(pictures.back(), 32)).scaled(IMAGE_WIDHT, IMAGE_HEIGHT, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    std::string filepath = filepaths.back();
+    filepath.replace(filepath.end()-6, filepath.end()-4,"");
+    bool highQualityFileExist = QFile(QString::fromStdString(filepath)).exists();
+    std::vector<double> picture = highQualityFileExist ? PictureController::loadPictures({filepath}).back() : pictures.back();
+    QPixmap pixmap = QPixmap::fromImage(PictureController::create(picture, 32 * (highQualityFileExist ? 4 : 1))).scaled(IMAGE_WIDHT, IMAGE_HEIGHT, Qt::IgnoreAspectRatio, Qt::FastTransformation);
     m_draggedImage.pixmap(pixmap);
     m_draggedImage.update();
-    if(results.back() < 0.5)
-        m_resultLabel.setText(tr("Open\nWith error: %1").arg(QString::number(fabs(results.back() - 0.1), 'g', 5)));
-    else
+    bool sunglassesDetected = results.back() > 0.5;
+    if(sunglassesDetected)
         m_resultLabel.setText(tr("Sunglasses\nWith error: %1").arg(QString::number(fabs(0.9 - results.back()), 'g', 5)));
+    else
+        m_resultLabel.setText(tr("Open\nWith error: %1").arg(QString::number(fabs(results.back() - 0.1), 'g', 5)));
+
+    bool success = sunglasses == sunglassesDetected;
+    m_resultImage.pixmap(success ? m_successImage : m_errorImage);
+    m_resultImage.setVisible(true);
+    m_resultImage.update();
 }
 
 void GraphicsScene::createANN()
@@ -489,18 +516,18 @@ void GraphicsScene::createANN()
 
     QDoubleSpinBox learningRateSpinBox(&dialog);
     learningRateSpinBox.setValue(0.5);
-    learningRateSpinBox.setMinimum(0.001);
+    learningRateSpinBox.setMinimum(0.05);
     learningRateSpinBox.setMaximum(1.0);
-    learningRateSpinBox.setSingleStep(learningRateSpinBox.minimum());
+    learningRateSpinBox.setSingleStep(0.05);
     learningRateSpinBox.setDecimals(3);
     QString learningRateLabel = tr("Learning rate");
     form.addRow(learningRateLabel, &learningRateSpinBox);
 
     QDoubleSpinBox momentumSpinBox(&dialog);
     momentumSpinBox.setValue(0.5);
-    momentumSpinBox.setMinimum(0.001);
+    momentumSpinBox.setMinimum(0.05);
     momentumSpinBox.setMaximum(1.0);
-    momentumSpinBox.setSingleStep(momentumSpinBox.minimum());
+    momentumSpinBox.setSingleStep(0.05);
     momentumSpinBox.setDecimals(3);
     QString momentumLabel = tr("Momentum");
     form.addRow(momentumLabel, &momentumSpinBox);

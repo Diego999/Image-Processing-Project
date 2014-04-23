@@ -56,6 +56,8 @@ private:
     QQueue<std::vector<QPointF>> m_futurePoints;
     QQueue<std::vector<std::vector<QPointF>>> m_futurePointsKFoldCrossValidation;
     QMutex m_mutex;
+    QPixmap m_successImage;
+    QPixmap m_errorImage;
     PushButton m_newButton;
     PushButton m_importButton;
     PushButton m_exportButton;
@@ -71,6 +73,7 @@ private:
     Pixmap m_bg3;
     Pixmap m_bg4;
     Pixmap m_draggedImage;
+    Pixmap m_resultImage;
     qint32 m_currentState;
     unsigned int m_k;
     bool m_finished;

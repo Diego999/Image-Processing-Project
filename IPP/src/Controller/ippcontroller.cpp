@@ -51,10 +51,10 @@ double IPPController::testValidity(const std::vector<std::string>& filepaths) co
     return annController->test(set);
 }
 
-std::vector<std::vector<double>> IPPController::generateTargets(const std::vector<std::string>& files) const
+const std::vector<std::vector<double>> IPPController::generateTargets(const std::vector<std::string>& filepaths)
 {
     std::vector<std::vector<double>> targets;
-    for(auto& file : files)
+    for(auto& file : filepaths)
     {
         std::vector<double> target;
         std::vector<std::string> tokens;

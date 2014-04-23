@@ -22,9 +22,9 @@ public:
     void setValidationSetPath(QString validationSetPath);
     void startTraining();
     std::vector<double> feed(const std::vector<std::string>& filepaths);
+    static const std::vector<std::vector<double>> generateTargets(const std::vector<std::string>& filepaths);
 
 private:
-    std::vector<std::vector<double>> generateTargets(const std::vector<std::string> &) const;
     ANNController* annController;
     std::shared_ptr<std::thread> thread;
     std::shared_ptr<GraphicsScene> m_graphicsScene;
