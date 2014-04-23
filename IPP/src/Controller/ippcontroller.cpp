@@ -202,3 +202,8 @@ std::vector<double> IPPController::feed(const std::vector<std::string>& filepath
         results.push_back(result[0]);
     return results;
 }
+
+void IPPController::reset()
+{
+
+}

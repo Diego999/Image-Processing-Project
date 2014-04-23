@@ -23,6 +23,8 @@ public:
     void startTraining();
     std::vector<double> feed(const std::vector<std::string>& filepaths);
     static const std::vector<std::vector<double>> generateTargets(const std::vector<std::string>& filepaths);
+    bool hasValidationSet() const { return !m_validationSet.empty(); }
+    void reset();
 
 private:
     ANNController* annController;

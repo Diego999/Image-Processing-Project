@@ -592,7 +592,8 @@ void GraphicsScene::createANN()
         }
         m_ippController->configANN(nbNeuronsPerHiddenLayer, learningRateSpinBox.value(), momentumSpinBox.value(), errorSpinBox.value(), kFoldCrossValidationCheckbox.isChecked(), kSpinBox.value());
         m_kFoldCrossValidation = kFoldCrossValidationCheckbox.isChecked();
-        m_k = kSpinBox.value();
+        m_k = m_kFoldCrossValidation ? kSpinBox.value() : 0;
+        m_validationButton.setVisible(!m_k);
         emit goToNextState();
     }
 }
@@ -634,7 +635,6 @@ void GraphicsScene::selectTrainingSet()
                                                     tr(QString("Training Set (*)").toStdString().c_str()));
     if(!fileName.isNull())
     {
-        m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
         m_ippController->setTrainingSetPath(fileName);
         m_startTrainingButton.setVisible(true);
     }
@@ -648,7 +648,6 @@ void GraphicsScene::selectValidationSet()
                                                     tr(QString("Validation Set (*)").toStdString().c_str()));
     if(!fileName.isNull())
     {
-        m_annGraphics.addCurve(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));
         m_ippController->setValidationSetPath(fileName);
     }
 }
@@ -677,6 +676,7 @@ void GraphicsScene::stateChange()
 {
     switch (m_currentState) {
     case START_MENU: // Start menu
+        m_ippController->reset();
         break;
     case SELECT_SETS_MENU: // Select sets menu
         m_startTrainingButton.setVisible(false);
@@ -693,6 +693,9 @@ void GraphicsScene::stateChange()
 
 void GraphicsScene::startTraining()
 {
+    m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
+    if(m_ippController->hasValidationSet())
+        m_annGraphics.addCurve(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));
     m_ippController->startTraining();
     emit goToNextState();
 }
