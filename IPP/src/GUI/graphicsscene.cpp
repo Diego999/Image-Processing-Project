@@ -21,6 +21,8 @@
 #define IMAGE_HEIGHT 300
 
 GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.width(), size.height()),
+    m_currentState(0),
+    m_finished(false),
     // the graphics
     m_annGraphics("Number of iterations", "Error"),
     m_successImage(":images/success"),
@@ -40,9 +42,7 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
     m_bg3(QPixmap(":images/bg3")),
     m_bg4(QPixmap(":images/bg4")),
     m_draggedImage(QPixmap(":images/draghere")),
-    m_resultImage(m_successImage),
-    m_currentState(0),
-    m_finished(false)
+    m_resultImage(m_successImage)
 {
     setBackgroundBrush(this->palette().window());
     m_errorsLabel.setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
@@ -410,7 +410,6 @@ void GraphicsScene::createUI()
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &GraphicsScene::checkStatus);
-    m_timer->start();
 }
 
 void GraphicsScene::checkStatus()
@@ -420,7 +419,6 @@ void GraphicsScene::checkStatus()
     {
         if(!m_futurePointsKFoldCrossValidation.isEmpty())
         {
-            qDebug() << "add to graph";
             std::vector<std::vector<QPointF>> points = m_futurePointsKFoldCrossValidation.dequeue();
             m_annGraphics.addPointKFoldCrossValidation(points);
         }
@@ -677,6 +675,10 @@ void GraphicsScene::stateChange()
     switch (m_currentState) {
     case START_MENU: // Start menu
         m_ippController->reset();
+        m_annGraphics.reset();
+        m_futurePoints.clear();
+        m_futurePointsKFoldCrossValidation.clear();
+        m_timer->stop();
         break;
     case SELECT_SETS_MENU: // Select sets menu
         m_startTrainingButton.setVisible(false);
@@ -693,6 +695,8 @@ void GraphicsScene::stateChange()
 
 void GraphicsScene::startTraining()
 {
+    m_finished = false;
+    m_timer->start();
     m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
     if(m_ippController->hasValidationSet())
         m_annGraphics.addCurve(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));

@@ -107,3 +107,14 @@ void ANNGraphics::addKFoldValidationCurves(unsigned int k)
         this->kFoldValidationCurves.push_back(std::pair<std::shared_ptr<QwtPlotCurve>, QPolygonF>(curveValidation, pointsValidation));
     }
 }
+
+void ANNGraphics::reset()
+{
+    for(auto curve : curves)
+        curve.first->detach();
+
+    for(auto curve : kFoldValidationCurves)
+        curve.first->detach();
+    curves.clear();
+    kFoldValidationCurves.clear();
+}

@@ -50,11 +50,19 @@ private slots:
     void startTraining();
 
 private:
+    // Tools
     IPPController* m_ippController;
-    QTimer *m_timer;
-    ANNGraphics m_annGraphics;
     QQueue<std::vector<QPointF>> m_futurePoints;
     QQueue<std::vector<std::vector<QPointF>>> m_futurePointsKFoldCrossValidation;
+    qint32 m_currentState;
+    unsigned int m_k;
+    bool m_finished;
+    bool m_kFoldCrossValidation;
+
+    QTimer *m_timer;
+
+    // GUI
+    ANNGraphics m_annGraphics;
     QMutex m_mutex;
     QPixmap m_successImage;
     QPixmap m_errorImage;
@@ -74,10 +82,6 @@ private:
     Pixmap m_bg4;
     Pixmap m_draggedImage;
     Pixmap m_resultImage;
-    qint32 m_currentState;
-    unsigned int m_k;
-    bool m_finished;
-    bool m_kFoldCrossValidation;
 
     void stateChange();
 

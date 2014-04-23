@@ -65,6 +65,7 @@ ANNController::ANNController(const std::string& filepath, const std::vector<std:
 void ANNController::kFoldCrossValidation(const std::function<void (long, std::vector<double>&, std::vector<double>&)> &callback, const std::function<void (long, double)> &callbackFinalANN, const unsigned int k, const std::function<void(void)>& didFinish)
 {
     assert(k >= 0);
+    m_training = true;
     std::vector<std::pair<std::vector<double>, std::vector<double>>> sets;
     ipp_utils::mergeVectors(sets, {m_trainingSet, m_validationSet});
 
@@ -121,10 +122,12 @@ void ANNController::kFoldCrossValidation(const std::function<void (long, std::ve
         callbackFinalANN(iteration, errorTot);
     }while(errorTot >= m_error && !m_stopTraining);
     didFinish();
+    m_training = false;
 }
 
 void ANNController::train(const std::function<void(long, double, double)> &callback, const std::function<void(void)>& didFinish)
 {
+    m_training = true;
     long iteration = 0L;
     double totalCurrentErrorTraining, totalCurrentErrorTest;
     m_stopTraining = false;
@@ -140,6 +143,7 @@ void ANNController::train(const std::function<void(long, double, double)> &callb
         callback(iteration++, totalCurrentErrorTraining, j == 0 ? -1 : totalCurrentErrorTest);
     } while(totalCurrentErrorTraining >= m_error && !m_stopTraining);
     didFinish();
+    m_training = false;
 }
 
 double ANNController::trainIteration(const std::pair<std::vector<double>, std::vector<double>>& set)

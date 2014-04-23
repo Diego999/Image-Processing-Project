@@ -26,6 +26,8 @@ public:
     void addPointKFoldCrossValidation(const std::vector<std::vector<QPointF>>& points);
     void addKFoldValidationCurves(unsigned int k);
 
+    void reset();
+
 private:
     void initBasic(const std::string &titleX, const std::string &titleY);
     void initLoop(std::shared_ptr<QwtPlotCurve> curve);

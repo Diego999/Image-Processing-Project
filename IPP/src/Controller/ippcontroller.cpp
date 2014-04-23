@@ -9,7 +9,7 @@
 #include <QFile>
 
 IPPController::IPPController(GraphicsScene& graphicsScene) :
-    annController(nullptr),
+    m_annController(nullptr),
     m_graphicsScene(&graphicsScene)
 {
     m_graphicsScene->ippController(this);
@@ -17,8 +17,8 @@ IPPController::IPPController(GraphicsScene& graphicsScene) :
 
 IPPController::~IPPController()
 {
-    if(annController != nullptr)
-        annController->stopTraining();
+    if(m_annController != nullptr)
+        m_annController->stopTraining();
     thread->join();
 }
 
@@ -48,7 +48,7 @@ double IPPController::testValidity(const std::vector<std::string>& filepaths) co
 
     for(size_t i = 0; i < inputSet.size(); ++i)
         set.push_back({inputSet[i], targetSet[i]});
-    return annController->test(set);
+    return m_annController->test(set);
 }
 
 const std::vector<std::vector<double>> IPPController::generateTargets(const std::vector<std::string>& filepaths)
@@ -70,12 +70,12 @@ const std::vector<std::vector<double>> IPPController::generateTargets(const std:
 
 void IPPController::importANN(QString annPath)
 {
-    annController = new ANNController(annPath.toStdString());
+    m_annController = std::make_shared<ANNController>(annPath.toStdString());
 }
 
 void IPPController::exportANN(QString annPath)
 {
-    annController->exportANN(annPath.toStdString());;
+    m_annController->exportANN(annPath.toStdString());;
 }
 
 void IPPController::configANN(const std::vector<int>& nbNeuronsPerHiddenLayer, double learningRate, double momentum, double error, bool kFoldCrossValidation, unsigned int k)
@@ -137,12 +137,12 @@ void IPPController::startTraining()
     if(!m_trainingSet.empty())
     {
         if(!m_validationSet.empty())
-            annController = new ANNController(m_nbNeuronsPerHiddenLayer, m_learningRate, m_momentum, m_trainingSet, m_validationSet);
+            m_annController = std::make_shared<ANNController>(m_nbNeuronsPerHiddenLayer, m_learningRate, m_momentum, m_trainingSet, m_validationSet);
         else
-            annController = new ANNController(m_nbNeuronsPerHiddenLayer, m_learningRate, m_momentum, m_trainingSet);
+            m_annController = std::make_shared<ANNController>(m_nbNeuronsPerHiddenLayer, m_learningRate, m_momentum, m_trainingSet);
     }
 
-    annController->error(m_error);
+    m_annController->error(m_error);
 
     std::function<void(void)> didFinish = [&](void)
     {
@@ -164,7 +164,6 @@ void IPPController::startTraining()
                 ++it2;
             }
             m_graphicsScene->addPointKFoldCrossValidation(points);
-            std::cout << i << std::endl;
         };
         std::function<void(long, double)> callbackFinalANN = [&](long i, double err)
             {
@@ -173,7 +172,7 @@ void IPPController::startTraining()
 
         std::cout << "[Training start]" << std::endl;
         thread = std::shared_ptr<std::thread>(new std::thread([=](){
-            annController->kFoldCrossValidation(callback, callbackFinalANN, m_k, didFinish);
+            m_annController->kFoldCrossValidation(callback, callbackFinalANN, m_k, didFinish);
         }));
     }
     else
@@ -188,7 +187,7 @@ void IPPController::startTraining()
 
         std::cout << "[Training start]" << std::endl;
         thread = std::shared_ptr<std::thread>(new std::thread([=](){
-            annController->train(callback, didFinish);
+            m_annController->train(callback, didFinish);
         }));
     }
 }
@@ -196,7 +195,7 @@ void IPPController::startTraining()
 std::vector<double> IPPController::feed(const std::vector<std::string>& filepaths)
 {
     std::vector<std::vector<double>> pictures = PictureController::loadPictures(filepaths, true);
-    std::vector<std::vector<double>> fullResults = annController->feedForward(pictures);
+    std::vector<std::vector<double>> fullResults = m_annController->feedForward(pictures);
     std::vector<double> results;
     for(auto result : fullResults)
         results.push_back(result[0]);
@@ -205,5 +204,9 @@ std::vector<double> IPPController::feed(const std::vector<std::string>& filepath
 
 void IPPController::reset()
 {
-
+    if(m_annController == nullptr) return;
+    m_annController->stopTraining();
+    while(m_annController->isTraining()) ;
+    m_annController.reset();
+    thread->join();
 }

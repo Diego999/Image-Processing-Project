@@ -27,7 +27,7 @@ public:
     void reset();
 
 private:
-    ANNController* annController;
+    std::shared_ptr<ANNController> m_annController;
     std::shared_ptr<std::thread> thread;
     std::shared_ptr<GraphicsScene> m_graphicsScene;
     std::vector<int> m_nbNeuronsPerHiddenLayer;
