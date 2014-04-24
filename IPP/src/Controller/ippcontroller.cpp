@@ -210,8 +210,13 @@ void IPPController::reset()
 {
     if(m_annController == nullptr) return;
     m_annController->stopTraining();
-    thread->join();
+    if(thread != nullptr) thread->join();
     m_annController.reset();
     m_trainingSet.clear();
     m_validationSet.clear();
+}
+
+void IPPController::stopTraining()
+{
+    m_annController->stopTraining();
 }

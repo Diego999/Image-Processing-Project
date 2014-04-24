@@ -34,6 +34,7 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
     m_trainingButton(tr("Select training set")),
     m_validationButton(tr("Select validation set")),
     m_startTrainingButton(tr("Start training")),
+    m_stopTrainingButton(tr("Stop")),
     m_nextButton("->"),
     m_backButton("<-"),
     //the backgrounds
@@ -74,6 +75,7 @@ void GraphicsScene::createUI()
     connect(&m_trainingButton, &QPushButton::clicked, this, &GraphicsScene::selectTrainingSet);
     connect(&m_validationButton, &QPushButton::clicked, this, &GraphicsScene::selectValidationSet);
     connect(&m_startTrainingButton, &QPushButton::clicked, this, &GraphicsScene::startTraining);
+    connect(&m_stopTrainingButton, &QPushButton::clicked, this, &GraphicsScene::stopTraining);
     connect(&m_nextButton, &QPushButton::clicked, this, &GraphicsScene::goToNextState);
     connect(&m_backButton, &QPushButton::clicked, this, &GraphicsScene::backToStartMenu);
 
@@ -85,6 +87,7 @@ void GraphicsScene::createUI()
     QGraphicsProxyWidget *trainingButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *testButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *startTrainingButtonProxy = new QGraphicsProxyWidget;
+    QGraphicsProxyWidget *stopTrainingButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *nextButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *backButtonProxy = new QGraphicsProxyWidget;
 
@@ -99,6 +102,7 @@ void GraphicsScene::createUI()
     trainingButtonProxy->setWidget(&m_trainingButton);
     testButtonProxy->setWidget(&m_validationButton);
     startTrainingButtonProxy->setWidget(&m_startTrainingButton);
+    stopTrainingButtonProxy->setWidget(&m_stopTrainingButton);
     nextButtonProxy->setWidget(&m_nextButton);
     backButtonProxy->setWidget(&m_backButton);
 
@@ -115,6 +119,7 @@ void GraphicsScene::createUI()
     addItem(trainingButtonProxy);
     addItem(testButtonProxy);
     addItem(startTrainingButtonProxy);
+    addItem(stopTrainingButtonProxy);
     addItem(backButtonProxy);
     addItem(nextButtonProxy);
 
@@ -142,10 +147,10 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateStart->assignProperty(backButtonProxy, "opacity", qreal(0));
     stateStart->assignProperty(nextButtonProxy, "opacity", qreal(0));
-    stateStart->assignProperty(startTrainingButtonProxy, "opacity", qreal(0));
     stateStart->assignProperty(backButtonProxy, "pos", QPointF(BORDER, height - m_backButton.height() - BORDER));
     stateStart->assignProperty(nextButtonProxy, "pos", QPointF(2 * width + width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
-    stateStart->assignProperty(startTrainingButtonProxy, "pos", QPointF(width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
+    stateStart->assignProperty(startTrainingButtonProxy, "pos", QPointF(2 * width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
+    stateStart->assignProperty(stopTrainingButtonProxy, "pos", QPointF(3 * width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
 
     stateStart->assignProperty(newButtonProxy, "pos", QPointF(width / 2 - m_newButton.width() / 2, height * 0.4));
     stateStart->assignProperty(importButtonProxy, "pos", QPointF(width / 2 - m_importButton.width() / 2, height * 0.6));
@@ -171,8 +176,9 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateSets->assignProperty(backButtonProxy, "opacity", qreal(1));
     stateSets->assignProperty(nextButtonProxy, "opacity", qreal(0));
-    stateSets->assignProperty(startTrainingButtonProxy, "opacity", qreal(1));
     stateSets->assignProperty(nextButtonProxy, "pos", QPointF(width + width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
+    stateSets->assignProperty(startTrainingButtonProxy, "pos", QPointF(width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
+    stateSets->assignProperty(stopTrainingButtonProxy, "pos", QPointF(2 * width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
 
     stateSets->assignProperty(newButtonProxy, "pos", QPointF(-(width + width / 2 - m_newButton.width() / 2), height * 0.4));
     stateSets->assignProperty(importButtonProxy, "pos", QPointF(-(width + width / 2 - m_importButton.width() / 2), height * 0.6));
@@ -196,8 +202,9 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateTesting->assignProperty(backButtonProxy, "opacity", qreal(1));
     stateTesting->assignProperty(nextButtonProxy, "opacity", qreal(1));
-    stateTesting->assignProperty(startTrainingButtonProxy, "opacity", qreal(0));
     stateTesting->assignProperty(nextButtonProxy, "pos", QPointF(width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
+    stateTesting->assignProperty(startTrainingButtonProxy, "pos", QPointF(-width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
+    stateTesting->assignProperty(stopTrainingButtonProxy, "pos", QPointF(width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
 
     stateTesting->assignProperty(newButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_newButton.width() / 2), height * 0.4));
     stateTesting->assignProperty(importButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_importButton.width() / 2), height * 0.6));
@@ -221,9 +228,9 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateMain->assignProperty(backButtonProxy, "opacity", qreal(1));
     stateMain->assignProperty(nextButtonProxy, "opacity", qreal(0));
-    stateMain->assignProperty(startTrainingButtonProxy, "opacity", qreal(0));
-
     stateMain->assignProperty(nextButtonProxy, "pos", QPointF(-width + width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
+    stateMain->assignProperty(startTrainingButtonProxy, "pos", QPointF(-2 * width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
+    stateMain->assignProperty(stopTrainingButtonProxy, "pos", QPointF(-width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
 
     stateMain->assignProperty(newButtonProxy, "pos", QPointF(-(4 * width + width / 2 - m_newButton.width() / 2), height * 0.4));
     stateMain->assignProperty(importButtonProxy, "pos", QPointF(-(4 * width + width / 2 - m_importButton.width() / 2), height * 0.6));
@@ -252,7 +259,6 @@ void GraphicsScene::createUI()
 
     t1->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
     t1->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
-    t1->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "opacity"));
 
     t1->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
     t1->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
@@ -279,7 +285,6 @@ void GraphicsScene::createUI()
 
     t2->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
     t2->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
-    t2->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "opacity"));
 
     t2->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
     t2->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
@@ -306,8 +311,6 @@ void GraphicsScene::createUI()
 
     t3->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
     t3->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
-    t3->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "opacity"));
-
     t3->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
     t3->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
     t3->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "pos"));
@@ -325,7 +328,59 @@ void GraphicsScene::createUI()
     t3->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
     t3->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
-    QAbstractTransition *t6 = stateTesting->addTransition(this, SIGNAL(goToPreviousState()), stateSets);
+    QAbstractTransition *t4 = stateTesting->addTransition(this, SIGNAL(goToPreviousState()), stateSets);
+    t4->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
+    t4->addAnimation(new QPropertyAnimation(&m_bg2, "opacity"));
+    t4->addAnimation(new QPropertyAnimation(&m_bg3, "opacity"));
+    t4->addAnimation(new QPropertyAnimation(&m_bg4, "opacity"));
+
+    t4->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
+    t4->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
+
+    t4->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(newButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(importButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(trainingButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(testButtonProxy, "pos"));
+
+    t4->addAnimation(new QPropertyAnimation(annGraphicsProxy, "pos"));
+
+    t4->addAnimation(new QPropertyAnimation(errorsLabelProxy, "pos"));
+
+    t4->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
+    t4->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t4->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
+
+    QAbstractTransition *t5 = stateTesting->addTransition(this, SIGNAL(goToNextState()), stateMain);
+    t5->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
+    t5->addAnimation(new QPropertyAnimation(&m_bg2, "opacity"));
+    t5->addAnimation(new QPropertyAnimation(&m_bg3, "opacity"));
+    t5->addAnimation(new QPropertyAnimation(&m_bg4, "opacity"));
+
+    t5->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
+    t5->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
+
+    t5->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(newButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(importButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(trainingButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(testButtonProxy, "pos"));
+
+    t5->addAnimation(new QPropertyAnimation(annGraphicsProxy, "pos"));
+
+    t5->addAnimation(new QPropertyAnimation(errorsLabelProxy, "pos"));
+
+    t5->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
+    t5->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
+    t5->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
+
+    QAbstractTransition *t6 = stateMain->addTransition(this, SIGNAL(goToPreviousState()), stateTesting);
     t6->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
     t6->addAnimation(new QPropertyAnimation(&m_bg2, "opacity"));
     t6->addAnimation(new QPropertyAnimation(&m_bg3, "opacity"));
@@ -333,7 +388,6 @@ void GraphicsScene::createUI()
 
     t6->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
     t6->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
-    t6->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "opacity"));
 
     t6->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
     t6->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
@@ -352,99 +406,10 @@ void GraphicsScene::createUI()
     t6->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
     t6->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
 
-    QAbstractTransition *t7 = stateTesting->addTransition(this, SIGNAL(goToNextState()), stateMain);
-    t7->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
-    t7->addAnimation(new QPropertyAnimation(&m_bg2, "opacity"));
-    t7->addAnimation(new QPropertyAnimation(&m_bg3, "opacity"));
-    t7->addAnimation(new QPropertyAnimation(&m_bg4, "opacity"));
-
-    t7->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
-    t7->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
-    t7->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "opacity"));
-
-    t7->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(newButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(importButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(trainingButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(testButtonProxy, "pos"));
-
-    t7->addAnimation(new QPropertyAnimation(annGraphicsProxy, "pos"));
-
-    t7->addAnimation(new QPropertyAnimation(errorsLabelProxy, "pos"));
-
-    t7->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
-    t7->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
-    t7->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
-
-    QAbstractTransition *t8 = stateMain->addTransition(this, SIGNAL(goToPreviousState()), stateTesting);
-    t8->addAnimation(new QPropertyAnimation(&m_bg1, "opacity"));
-    t8->addAnimation(new QPropertyAnimation(&m_bg2, "opacity"));
-    t8->addAnimation(new QPropertyAnimation(&m_bg3, "opacity"));
-    t8->addAnimation(new QPropertyAnimation(&m_bg4, "opacity"));
-
-    t8->addAnimation(new QPropertyAnimation(backButtonProxy, "opacity"));
-    t8->addAnimation(new QPropertyAnimation(nextButtonProxy, "opacity"));
-    t8->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "opacity"));
-
-    t8->addAnimation(new QPropertyAnimation(backButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(nextButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(startTrainingButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(newButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(importButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(trainingButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(testButtonProxy, "pos"));
-
-    t8->addAnimation(new QPropertyAnimation(annGraphicsProxy, "pos"));
-
-    t8->addAnimation(new QPropertyAnimation(errorsLabelProxy, "pos"));
-
-    t8->addAnimation(new QPropertyAnimation(exportButtonProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(&m_draggedImage, "pos"));
-    t8->addAnimation(new QPropertyAnimation(resultsLabelProxy, "pos"));
-    t8->addAnimation(new QPropertyAnimation(&m_resultImage, "pos"));
-
     machine->start();
 
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &GraphicsScene::checkStatus);
-}
-
-void GraphicsScene::checkStatus()
-{
-    m_mutex.lock();
-    if(m_kFoldCrossValidation)
-    {
-        if(!m_futurePointsKFoldCrossValidation.isEmpty())
-        {
-            std::vector<std::vector<QPointF>> points = m_futurePointsKFoldCrossValidation.dequeue();
-            m_annGraphics.addPointKFoldCrossValidation(points);
-        }
-        if(!m_futurePoints.isEmpty())
-        {
-            std::vector<QPointF> points = m_futurePoints.dequeue();
-            m_annGraphics.addPoint(points);
-            m_errorsLabel.setText(formatErrorsLabel(points));
-        }
-    }
-    else
-    {
-        if(!m_futurePoints.isEmpty())
-        {
-            std::vector<QPointF> points = m_futurePoints.dequeue();
-            m_annGraphics.addPoint(points);
-            m_errorsLabel.setText(formatErrorsLabel(points));
-        }
-    }
-    // Enable next button if training is finished
-    if(m_finished)
-    {
-        m_nextButton.setVisible(m_finished);
-        m_timer->stop();
-    }
-    m_mutex.unlock();
 }
 
 void GraphicsScene::addPoint(const std::vector<QPointF>& points)
@@ -703,8 +668,45 @@ void GraphicsScene::stateChange()
     }
 }
 
+void GraphicsScene::checkStatus()
+{
+    m_mutex.lock();
+    if(m_kFoldCrossValidation)
+    {
+        if(!m_futurePointsKFoldCrossValidation.isEmpty())
+        {
+            std::vector<std::vector<QPointF>> points = m_futurePointsKFoldCrossValidation.dequeue();
+            m_annGraphics.addPointKFoldCrossValidation(points);
+        }
+        if(!m_futurePoints.isEmpty())
+        {
+            std::vector<QPointF> points = m_futurePoints.dequeue();
+            m_annGraphics.addPoint(points);
+            m_errorsLabel.setText(formatErrorsLabel(points));
+        }
+    }
+    else
+    {
+        if(!m_futurePoints.isEmpty())
+        {
+            std::vector<QPointF> points = m_futurePoints.dequeue();
+            m_annGraphics.addPoint(points);
+            m_errorsLabel.setText(formatErrorsLabel(points));
+        }
+    }
+    // Enable next button if training is finished
+    if(m_finished)
+    {
+        m_stopTrainingButton.setVisible(false);
+        m_nextButton.setVisible(m_finished);
+        m_timer->stop();
+    }
+    m_mutex.unlock();
+}
+
 void GraphicsScene::startTraining()
 {
+    m_stopTrainingButton.setVisible(true);
     m_finished = false;
     m_timer->start();
     m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
@@ -712,4 +714,9 @@ void GraphicsScene::startTraining()
         m_annGraphics.addCurve(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));
     m_ippController->startTraining();
     emit goToNextState();
+}
+
+void GraphicsScene::stopTraining()
+{
+    m_ippController->stopTraining();
 }

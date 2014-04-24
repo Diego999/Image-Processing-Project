@@ -48,6 +48,7 @@ private slots:
     void previousState();
     void backToStartMenu();
     void startTraining();
+    void stopTraining();
 
 private:
     // Tools
@@ -74,6 +75,7 @@ private:
     PushButton m_trainingButton;
     PushButton m_validationButton;
     PushButton m_startTrainingButton;
+    PushButton m_stopTrainingButton;
     PushButton m_nextButton;
     PushButton m_backButton;
     QLabel m_errorsLabel;

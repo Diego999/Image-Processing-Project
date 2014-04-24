@@ -25,6 +25,7 @@ public:
     static const std::vector<std::vector<double>> generateTargets(const std::vector<std::string>& filepaths);
     bool hasValidationSet() const { return !m_validationSet.empty(); }
     void reset();
+    void stopTraining();
 
 private:
     std::shared_ptr<ANNController> m_annController;
