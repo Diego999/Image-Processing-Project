@@ -654,6 +654,9 @@ void GraphicsScene::stateChange()
         m_futurePoints.clear();
         m_futurePointsKFoldCrossValidation.clear();
         m_timer->stop();
+        m_draggedImage.pixmap(QPixmap(":images/draghere"));
+        m_resultImage.setVisible(false);
+        m_resultLabel.setText("");
         break;
     case SELECT_SETS_MENU: // Select sets menu
         m_startTrainingButton.setVisible(false);
