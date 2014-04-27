@@ -67,21 +67,21 @@ private:
     QTimer *m_timer;
 
     // GUI
-    ANNGraphics m_annGraphics;
+    std::shared_ptr<ANNGraphics> m_annGraphics;
     QMutex m_mutex;
-    QPixmap m_successImage;
-    QPixmap m_errorImage;
-    PushButton m_newButton;
-    PushButton m_importButton;
-    PushButton m_exportButton;
-    PushButton m_trainingButton;
-    PushButton m_validationButton;
-    PushButton m_startTrainingButton;
-    PushButton m_stopTrainingButton;
-    PushButton m_nextButton;
-    PushButton m_backButton;
-    QLabel m_errorsLabel;
-    QLabel m_resultLabel;
+    std::shared_ptr<QPixmap> m_successImage;
+    std::shared_ptr<QPixmap> m_errorImage;
+    std::shared_ptr<PushButton> m_newButton;
+    std::shared_ptr<PushButton> m_importButton;
+    std::shared_ptr<PushButton> m_exportButton;
+    std::shared_ptr<PushButton> m_trainingButton;
+    std::shared_ptr<PushButton> m_validationButton;
+    std::shared_ptr<PushButton> m_startTrainingButton;
+    std::shared_ptr<PushButton> m_stopTrainingButton;
+    std::shared_ptr<PushButton> m_nextButton;
+    std::shared_ptr<PushButton> m_backButton;
+    std::shared_ptr<QLabel> m_errorsLabel;
+    std::shared_ptr<QLabel> m_resultLabel;
     std::shared_ptr<Pixmap> m_bg1;
     std::shared_ptr<Pixmap> m_bg2;
     std::shared_ptr<Pixmap> m_bg3;

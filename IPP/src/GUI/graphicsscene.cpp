@@ -24,32 +24,34 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
     m_currentState(0),
     m_finished(false),
     // the graphics
-    m_annGraphics("Number of iterations", "Error"),
-    m_successImage(":images/success"),
-    m_errorImage(":images/error"),
+    m_annGraphics(std::make_shared<ANNGraphics>("Number of iterations", "Error")),
+    m_successImage(std::make_shared<QPixmap>(":images/success")),
+    m_errorImage(std::make_shared<QPixmap>(":images/error")),
     // Text edit and button
-    m_newButton(tr("New")),
-    m_importButton(tr("Import")),
-    m_exportButton(tr("Export")),
-    m_trainingButton(tr("Select training set")),
-    m_validationButton(tr("Select validation set")),
-    m_startTrainingButton(tr("Start training")),
-    m_stopTrainingButton(tr("Stop")),
-    m_nextButton("->"),
-    m_backButton("<-"),
+    m_newButton(std::make_shared<PushButton>(tr("New"))),
+    m_importButton(std::make_shared<PushButton>(tr("Import"))),
+    m_exportButton(std::make_shared<PushButton>(tr("Export"))),
+    m_trainingButton(std::make_shared<PushButton>(tr("Select training set"))),
+    m_validationButton(std::make_shared<PushButton>(tr("Select validation set"))),
+    m_startTrainingButton(std::make_shared<PushButton>(tr("Start training"))),
+    m_stopTrainingButton(std::make_shared<PushButton>(tr("Stop"))),
+    m_nextButton(std::make_shared<PushButton>("->")),
+    m_backButton(std::make_shared<PushButton>("<-")),
+    m_errorsLabel(std::make_shared<QLabel>("")),
+    m_resultLabel(std::make_shared<QLabel>("")),
     //the backgrounds
     m_bg1(std::make_shared<Pixmap>(QPixmap(":images/bg1"))),
     m_bg2(std::make_shared<Pixmap>(QPixmap(":images/bg2"))),
     m_bg3(std::make_shared<Pixmap>(QPixmap(":images/bg3"))),
     m_bg4(std::make_shared<Pixmap>(QPixmap(":images/bg4"))),
     m_draggedImage(std::make_shared<Pixmap>(QPixmap(":images/draghere"))),
-    m_resultImage(std::make_shared<Pixmap>(m_successImage))
+    m_resultImage(std::make_shared<Pixmap>(*m_successImage))
 {
     setBackgroundBrush(this->palette().window());
-    m_errorsLabel.setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
-    m_errorsLabel.resize(350, 64); // Values from test
-    m_resultLabel.setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
-    m_resultLabel.resize(IMAGE_WIDHT + 20, 64); // Values from test
+    m_errorsLabel->setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
+    m_errorsLabel->resize(350, 64); // Values from test
+    m_resultLabel->setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
+    m_resultLabel->resize(IMAGE_WIDHT + 20, 64); // Values from test
 }
 
 void GraphicsScene::createUI()
@@ -69,17 +71,17 @@ void GraphicsScene::createUI()
       http://qt-project.org/doc/qt-5/statemachine-api.html
     **/
 
-    connect(&m_newButton, &QPushButton::clicked, this, &GraphicsScene::createANN);
-    connect(&m_importButton, &QPushButton::clicked, this, &GraphicsScene::importANN);
-    connect(&m_exportButton, &QPushButton::clicked, this, &GraphicsScene::exportANN);
-    connect(&m_trainingButton, &QPushButton::clicked, this, &GraphicsScene::selectTrainingSet);
-    connect(&m_validationButton, &QPushButton::clicked, this, &GraphicsScene::selectValidationSet);
-    connect(&m_startTrainingButton, &QPushButton::clicked, this, &GraphicsScene::startTraining);
-    connect(&m_stopTrainingButton, &QPushButton::clicked, this, &GraphicsScene::stopTraining);
-    connect(&m_nextButton, &QPushButton::clicked, this, &GraphicsScene::goToNextState);
-    connect(&m_backButton, &QPushButton::clicked, this, &GraphicsScene::backToStartMenu);
+    connect(&*m_newButton, &QPushButton::clicked, this, &GraphicsScene::createANN);
+    connect(&*m_importButton, &QPushButton::clicked, this, &GraphicsScene::importANN);
+    connect(&*m_exportButton, &QPushButton::clicked, this, &GraphicsScene::exportANN);
+    connect(&*m_trainingButton, &QPushButton::clicked, this, &GraphicsScene::selectTrainingSet);
+    connect(&*m_validationButton, &QPushButton::clicked, this, &GraphicsScene::selectValidationSet);
+    connect(&*m_startTrainingButton, &QPushButton::clicked, this, &GraphicsScene::startTraining);
+    connect(&*m_stopTrainingButton, &QPushButton::clicked, this, &GraphicsScene::stopTraining);
+    connect(&*m_nextButton, &QPushButton::clicked, this, &GraphicsScene::goToNextState);
+    connect(&*m_backButton, &QPushButton::clicked, this, &GraphicsScene::backToStartMenu);
 
-    m_annGraphics.resize(550, 550);
+    m_annGraphics->resize(550, 550);
 
     QGraphicsProxyWidget *newButtonProxy = new QGraphicsProxyWidget;
     QGraphicsProxyWidget *importButtonProxy = new QGraphicsProxyWidget;
@@ -96,20 +98,20 @@ void GraphicsScene::createUI()
 
     QGraphicsProxyWidget *annGraphicsProxy = new QGraphicsProxyWidget;
 
-    newButtonProxy->setWidget(&m_newButton);
-    importButtonProxy->setWidget(&m_importButton);
-    exportButtonProxy->setWidget(&m_exportButton);
-    trainingButtonProxy->setWidget(&m_trainingButton);
-    testButtonProxy->setWidget(&m_validationButton);
-    startTrainingButtonProxy->setWidget(&m_startTrainingButton);
-    stopTrainingButtonProxy->setWidget(&m_stopTrainingButton);
-    nextButtonProxy->setWidget(&m_nextButton);
-    backButtonProxy->setWidget(&m_backButton);
+    newButtonProxy->setWidget(&*m_newButton);
+    importButtonProxy->setWidget(&*m_importButton);
+    exportButtonProxy->setWidget(&*m_exportButton);
+    trainingButtonProxy->setWidget(&*m_trainingButton);
+    testButtonProxy->setWidget(&*m_validationButton);
+    startTrainingButtonProxy->setWidget(&*m_startTrainingButton);
+    stopTrainingButtonProxy->setWidget(&*m_stopTrainingButton);
+    nextButtonProxy->setWidget(&*m_nextButton);
+    backButtonProxy->setWidget(&*m_backButton);
 
-    errorsLabelProxy->setWidget(&m_errorsLabel);
-    resultsLabelProxy->setWidget(&m_resultLabel);
+    errorsLabelProxy->setWidget(&*m_errorsLabel);
+    resultsLabelProxy->setWidget(&*m_resultLabel);
 
-    annGraphicsProxy->setWidget(&m_annGraphics);
+    annGraphicsProxy->setWidget(&*m_annGraphics);
 
     addItem(&*m_draggedImage);
 
@@ -147,25 +149,25 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateStart->assignProperty(backButtonProxy, "opacity", qreal(0));
     stateStart->assignProperty(nextButtonProxy, "opacity", qreal(0));
-    stateStart->assignProperty(backButtonProxy, "pos", QPointF(BORDER, height - m_backButton.height() - BORDER));
-    stateStart->assignProperty(nextButtonProxy, "pos", QPointF(2 * width + width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
-    stateStart->assignProperty(startTrainingButtonProxy, "pos", QPointF(2 * width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
-    stateStart->assignProperty(stopTrainingButtonProxy, "pos", QPointF(3 * width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
+    stateStart->assignProperty(backButtonProxy, "pos", QPointF(BORDER, height - m_backButton->height() - BORDER));
+    stateStart->assignProperty(nextButtonProxy, "pos", QPointF(2 * width + width - m_nextButton->width() - BORDER, height - m_nextButton->height() - BORDER));
+    stateStart->assignProperty(startTrainingButtonProxy, "pos", QPointF(2 * width - m_startTrainingButton->width() - BORDER, height - m_startTrainingButton->height() - BORDER));
+    stateStart->assignProperty(stopTrainingButtonProxy, "pos", QPointF(3 * width - m_stopTrainingButton->width() - BORDER, height - m_stopTrainingButton->height() - BORDER));
 
-    stateStart->assignProperty(newButtonProxy, "pos", QPointF(width / 2 - m_newButton.width() / 2, height * 0.4));
-    stateStart->assignProperty(importButtonProxy, "pos", QPointF(width / 2 - m_importButton.width() / 2, height * 0.6));
-    stateStart->assignProperty(trainingButtonProxy, "pos", QPointF(width + width / 2 - m_trainingButton.width() / 2, height * 0.4));
-    stateStart->assignProperty(testButtonProxy, "pos", QPointF(width + width / 2 - m_validationButton.width() / 2, height / 2));
+    stateStart->assignProperty(newButtonProxy, "pos", QPointF(width / 2 - m_newButton->width() / 2, height * 0.4));
+    stateStart->assignProperty(importButtonProxy, "pos", QPointF(width / 2 - m_importButton->width() / 2, height * 0.6));
+    stateStart->assignProperty(trainingButtonProxy, "pos", QPointF(width + width / 2 - m_trainingButton->width() / 2, height * 0.4));
+    stateStart->assignProperty(testButtonProxy, "pos", QPointF(width + width / 2 - m_validationButton->width() / 2, height / 2));
 
-    stateStart->assignProperty(annGraphicsProxy, "pos", QPointF(2 * width + width / 2 - m_annGraphics.width() / 2, height / 2 - m_annGraphics.height() / 2));
-    stateStart->assignProperty(errorsLabelProxy, "pos", QPointF(2 * width + width / 2 - m_errorsLabel.width() / 2, height / 2 + m_annGraphics.height() / 2 + 10));
+    stateStart->assignProperty(annGraphicsProxy, "pos", QPointF(2 * width + width / 2 - m_annGraphics->width() / 2, height / 2 - m_annGraphics->height() / 2));
+    stateStart->assignProperty(errorsLabelProxy, "pos", QPointF(2 * width + width / 2 - m_errorsLabel->width() / 2, height / 2 + m_annGraphics->height() / 2 + 10));
 
     qreal topBotSpace = height / 2 - m_draggedImage->height() / 2;
 
-    stateStart->assignProperty(exportButtonProxy, "pos", QPointF(3 * width + width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
+    stateStart->assignProperty(exportButtonProxy, "pos", QPointF(3 * width + width / 2 - m_exportButton->width() / 2, topBotSpace / 2 - m_exportButton->height() / 2));
     stateStart->assignProperty(&*m_draggedImage, "pos", QPointF(3 * width + width / 2 - m_draggedImage->width() / 2, height / 2 - m_draggedImage->height() / 2));
-    stateStart->assignProperty(resultsLabelProxy, "pos", QPointF(3 * width + width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
-    stateStart->assignProperty(&*m_resultImage, "pos", QPointF(3 * width + width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateStart->assignProperty(resultsLabelProxy, "pos", QPointF(3 * width + width / 2 - m_resultLabel->width() / 2, height - topBotSpace / 2 - m_resultLabel->height() / 2));
+    stateStart->assignProperty(&*m_resultImage, "pos", QPointF(3 * width + width / 2 + m_resultLabel->width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel->height() / 2));
 
     stateStart->assignProperty(&*m_bg1, "opacity", qreal(1));
     stateStart->assignProperty(&*m_bg2, "opacity", qreal(0));
@@ -176,22 +178,22 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateSets->assignProperty(backButtonProxy, "opacity", qreal(1));
     stateSets->assignProperty(nextButtonProxy, "opacity", qreal(0));
-    stateSets->assignProperty(nextButtonProxy, "pos", QPointF(width + width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
-    stateSets->assignProperty(startTrainingButtonProxy, "pos", QPointF(width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
-    stateSets->assignProperty(stopTrainingButtonProxy, "pos", QPointF(2 * width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
+    stateSets->assignProperty(nextButtonProxy, "pos", QPointF(width + width - m_nextButton->width() - BORDER, height - m_nextButton->height() - BORDER));
+    stateSets->assignProperty(startTrainingButtonProxy, "pos", QPointF(width - m_startTrainingButton->width() - BORDER, height - m_startTrainingButton->height() - BORDER));
+    stateSets->assignProperty(stopTrainingButtonProxy, "pos", QPointF(2 * width - m_stopTrainingButton->width() - BORDER, height - m_stopTrainingButton->height() - BORDER));
 
-    stateSets->assignProperty(newButtonProxy, "pos", QPointF(-(width + width / 2 - m_newButton.width() / 2), height * 0.4));
-    stateSets->assignProperty(importButtonProxy, "pos", QPointF(-(width + width / 2 - m_importButton.width() / 2), height * 0.6));
-    stateSets->assignProperty(trainingButtonProxy, "pos", QPointF(width /2 - m_trainingButton.width() / 2, height * 0.4));
-    stateSets->assignProperty(testButtonProxy, "pos", QPointF(width / 2 - m_validationButton.width() / 2, height * 0.6));
+    stateSets->assignProperty(newButtonProxy, "pos", QPointF(-(width + width / 2 - m_newButton->width() / 2), height * 0.4));
+    stateSets->assignProperty(importButtonProxy, "pos", QPointF(-(width + width / 2 - m_importButton->width() / 2), height * 0.6));
+    stateSets->assignProperty(trainingButtonProxy, "pos", QPointF(width /2 - m_trainingButton->width() / 2, height * 0.4));
+    stateSets->assignProperty(testButtonProxy, "pos", QPointF(width / 2 - m_validationButton->width() / 2, height * 0.6));
 
-    stateSets->assignProperty(annGraphicsProxy, "pos", QPointF(width + width / 2 - m_annGraphics.width() / 2, height / 2 - m_annGraphics.height() / 2));
-    stateSets->assignProperty(errorsLabelProxy, "pos", QPointF(width + width / 2 - m_errorsLabel.width() / 2, height / 2 + m_annGraphics.height() / 2 + 10));
+    stateSets->assignProperty(annGraphicsProxy, "pos", QPointF(width + width / 2 - m_annGraphics->width() / 2, height / 2 - m_annGraphics->height() / 2));
+    stateSets->assignProperty(errorsLabelProxy, "pos", QPointF(width + width / 2 - m_errorsLabel->width() / 2, height / 2 + m_annGraphics->height() / 2 + 10));
 
-    stateSets->assignProperty(exportButtonProxy, "pos", QPointF(2 * width + width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
+    stateSets->assignProperty(exportButtonProxy, "pos", QPointF(2 * width + width / 2 - m_exportButton->width() / 2, topBotSpace / 2 - m_exportButton->height() / 2));
     stateSets->assignProperty(&*m_draggedImage, "pos", QPointF(2 * width + width / 2 - m_draggedImage->width() / 2, height / 2 - m_draggedImage->height() / 2));
-    stateSets->assignProperty(resultsLabelProxy, "pos", QPointF(2 * width + width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
-    stateSets->assignProperty(&*m_resultImage, "pos", QPointF(2 * width + width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateSets->assignProperty(resultsLabelProxy, "pos", QPointF(2 * width + width / 2 - m_resultLabel->width() / 2, height - topBotSpace / 2 - m_resultLabel->height() / 2));
+    stateSets->assignProperty(&*m_resultImage, "pos", QPointF(2 * width + width / 2 + m_resultLabel->width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel->height() / 2));
 
     stateSets->assignProperty(&*m_bg1, "opacity", qreal(0));
     stateSets->assignProperty(&*m_bg2, "opacity", qreal(1));
@@ -202,22 +204,22 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateTesting->assignProperty(backButtonProxy, "opacity", qreal(1));
     stateTesting->assignProperty(nextButtonProxy, "opacity", qreal(1));
-    stateTesting->assignProperty(nextButtonProxy, "pos", QPointF(width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
-    stateTesting->assignProperty(startTrainingButtonProxy, "pos", QPointF(-width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
-    stateTesting->assignProperty(stopTrainingButtonProxy, "pos", QPointF(width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
+    stateTesting->assignProperty(nextButtonProxy, "pos", QPointF(width - m_nextButton->width() - BORDER, height - m_nextButton->height() - BORDER));
+    stateTesting->assignProperty(startTrainingButtonProxy, "pos", QPointF(-width - m_startTrainingButton->width() - BORDER, height - m_startTrainingButton->height() - BORDER));
+    stateTesting->assignProperty(stopTrainingButtonProxy, "pos", QPointF(width - m_stopTrainingButton->width() - BORDER, height - m_stopTrainingButton->height() - BORDER));
 
-    stateTesting->assignProperty(newButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_newButton.width() / 2), height * 0.4));
-    stateTesting->assignProperty(importButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_importButton.width() / 2), height * 0.6));
-    stateTesting->assignProperty(trainingButtonProxy, "pos", QPointF(-(2 * width + width / 2 - m_trainingButton.width() / 2), height / 2));
-    stateTesting->assignProperty(testButtonProxy, "pos", QPointF(-(2 * width + width / 2 - m_validationButton.width() / 2), height / 2));
+    stateTesting->assignProperty(newButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_newButton->width() / 2), height * 0.4));
+    stateTesting->assignProperty(importButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_importButton->width() / 2), height * 0.6));
+    stateTesting->assignProperty(trainingButtonProxy, "pos", QPointF(-(2 * width + width / 2 - m_trainingButton->width() / 2), height / 2));
+    stateTesting->assignProperty(testButtonProxy, "pos", QPointF(-(2 * width + width / 2 - m_validationButton->width() / 2), height / 2));
 
-    stateTesting->assignProperty(annGraphicsProxy, "pos", QPointF(width / 2 - m_annGraphics.width() / 2, height / 2 - m_annGraphics.height() / 2));
-    stateTesting->assignProperty(errorsLabelProxy, "pos", QPointF(width / 2 - m_errorsLabel.width() / 2, height / 2 + m_annGraphics.height() / 2 + 10));
+    stateTesting->assignProperty(annGraphicsProxy, "pos", QPointF(width / 2 - m_annGraphics->width() / 2, height / 2 - m_annGraphics->height() / 2));
+    stateTesting->assignProperty(errorsLabelProxy, "pos", QPointF(width / 2 - m_errorsLabel->width() / 2, height / 2 + m_annGraphics->height() / 2 + 10));
 
-    stateTesting->assignProperty(exportButtonProxy, "pos", QPointF(width + width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
+    stateTesting->assignProperty(exportButtonProxy, "pos", QPointF(width + width / 2 - m_exportButton->width() / 2, topBotSpace / 2 - m_exportButton->height() / 2));
     stateTesting->assignProperty(&*m_draggedImage, "pos", QPointF(width + width / 2 - m_draggedImage->width() / 2, height / 2 - m_draggedImage->height() / 2));
-    stateTesting->assignProperty(resultsLabelProxy, "pos", QPointF(width + width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
-    stateTesting->assignProperty(&*m_resultImage, "pos", QPointF(width + width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateTesting->assignProperty(resultsLabelProxy, "pos", QPointF(width + width / 2 - m_resultLabel->width() / 2, height - topBotSpace / 2 - m_resultLabel->height() / 2));
+    stateTesting->assignProperty(&*m_resultImage, "pos", QPointF(width + width / 2 + m_resultLabel->width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel->height() / 2));
 
     stateTesting->assignProperty(&*m_bg1, "opacity", qreal(0));
     stateTesting->assignProperty(&*m_bg2, "opacity", qreal(0));
@@ -228,22 +230,22 @@ void GraphicsScene::createUI()
     // bottom buttons
     stateMain->assignProperty(backButtonProxy, "opacity", qreal(1));
     stateMain->assignProperty(nextButtonProxy, "opacity", qreal(0));
-    stateMain->assignProperty(nextButtonProxy, "pos", QPointF(-width + width - m_nextButton.width() - BORDER, height - m_nextButton.height() - BORDER));
-    stateMain->assignProperty(startTrainingButtonProxy, "pos", QPointF(-2 * width - m_startTrainingButton.width() - BORDER, height - m_startTrainingButton.height() - BORDER));
-    stateMain->assignProperty(stopTrainingButtonProxy, "pos", QPointF(-width - m_stopTrainingButton.width() - BORDER, height - m_stopTrainingButton.height() - BORDER));
+    stateMain->assignProperty(nextButtonProxy, "pos", QPointF(-width + width - m_nextButton->width() - BORDER, height - m_nextButton->height() - BORDER));
+    stateMain->assignProperty(startTrainingButtonProxy, "pos", QPointF(-2 * width - m_startTrainingButton->width() - BORDER, height - m_startTrainingButton->height() - BORDER));
+    stateMain->assignProperty(stopTrainingButtonProxy, "pos", QPointF(-width - m_stopTrainingButton->width() - BORDER, height - m_stopTrainingButton->height() - BORDER));
 
-    stateMain->assignProperty(newButtonProxy, "pos", QPointF(-(4 * width + width / 2 - m_newButton.width() / 2), height * 0.4));
-    stateMain->assignProperty(importButtonProxy, "pos", QPointF(-(4 * width + width / 2 - m_importButton.width() / 2), height * 0.6));
-    stateMain->assignProperty(trainingButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_trainingButton.width() / 2), height / 2));
-    stateMain->assignProperty(testButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_validationButton.width() / 2), height / 2));
+    stateMain->assignProperty(newButtonProxy, "pos", QPointF(-(4 * width + width / 2 - m_newButton->width() / 2), height * 0.4));
+    stateMain->assignProperty(importButtonProxy, "pos", QPointF(-(4 * width + width / 2 - m_importButton->width() / 2), height * 0.6));
+    stateMain->assignProperty(trainingButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_trainingButton->width() / 2), height / 2));
+    stateMain->assignProperty(testButtonProxy, "pos", QPointF(-(3 * width + width / 2 - m_validationButton->width() / 2), height / 2));
 
-    stateMain->assignProperty(annGraphicsProxy, "pos", QPointF(-(width + width / 2 - m_annGraphics.width() / 2), height / 2 - m_annGraphics.height() / 2));
-    stateMain->assignProperty(errorsLabelProxy, "pos", QPointF(-(width + width / 2 - m_errorsLabel.width() / 2), height / 2 + m_annGraphics.height() / 2 + 10));
+    stateMain->assignProperty(annGraphicsProxy, "pos", QPointF(-(width + width / 2 - m_annGraphics->width() / 2), height / 2 - m_annGraphics->height() / 2));
+    stateMain->assignProperty(errorsLabelProxy, "pos", QPointF(-(width + width / 2 - m_errorsLabel->width() / 2), height / 2 + m_annGraphics->height() / 2 + 10));
 
-    stateMain->assignProperty(exportButtonProxy, "pos", QPointF(width / 2 - m_exportButton.width() / 2, topBotSpace / 2 - m_exportButton.height() / 2));
+    stateMain->assignProperty(exportButtonProxy, "pos", QPointF(width / 2 - m_exportButton->width() / 2, topBotSpace / 2 - m_exportButton->height() / 2));
     stateMain->assignProperty(&*m_draggedImage, "pos", QPointF(width / 2 - m_draggedImage->width() / 2, height / 2 - m_draggedImage->height() / 2));
-    stateMain->assignProperty(resultsLabelProxy, "pos", QPointF(width / 2 - m_resultLabel.width() / 2, height - topBotSpace / 2 - m_resultLabel.height() / 2));
-    stateMain->assignProperty(&*m_resultImage, "pos", QPointF(width / 2 + m_resultLabel.width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel.height() / 2));
+    stateMain->assignProperty(resultsLabelProxy, "pos", QPointF(width / 2 - m_resultLabel->width() / 2, height - topBotSpace / 2 - m_resultLabel->height() / 2));
+    stateMain->assignProperty(&*m_resultImage, "pos", QPointF(width / 2 + m_resultLabel->width() / 2 + BORDER, height - topBotSpace / 2 - m_resultLabel->height() / 2));
 
     stateMain->assignProperty(&*m_bg1, "opacity", qreal(0));
     stateMain->assignProperty(&*m_bg2, "opacity", qreal(0));
@@ -478,13 +480,13 @@ void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
 
     bool sunglassesDetected = results.back() > 0.5;
     if(sunglassesDetected)
-        m_resultLabel.setText(tr("Sunglasses\nWith error: %1\n%2% dragged found with %3 mean error")
+        m_resultLabel->setText(tr("Sunglasses\nWith error: %1\n%2% dragged found with %3 mean error")
                               .arg(QString::number(fabs(0.9 - results.back()), 'g', 5),
                                    QString::number(correctFound / (double)filepaths.size() * 100, 'g', 3),
                                    QString::number(errorTotal / filepaths.size(), 'g', 5)
                                    ));
     else
-        m_resultLabel.setText(tr("Open\nWith error: %1\n%2% dragged found with %3 mean error")
+        m_resultLabel->setText(tr("Open\nWith error: %1\n%2% dragged found with %3 mean error")
                               .arg(QString::number(fabs(0.1 - results.back()), 'g', 5),
                                    QString::number(correctFound / (double)filepaths.size() * 100, 'g', 3),
                                    QString::number(errorTotal / filepaths.size(), 'g', 5)
@@ -492,7 +494,7 @@ void GraphicsScene::dropData(const std::vector<std::string>& filepaths)
 
     bool sunglasses = targets.back().back() > 0.5;
     bool success = sunglasses == sunglassesDetected;
-    m_resultImage->pixmap(success ? m_successImage : m_errorImage);
+    m_resultImage->pixmap(success ? *m_successImage : *m_errorImage);
     m_resultImage->setVisible(true);
     m_resultImage->update();
 }
@@ -566,14 +568,14 @@ void GraphicsScene::createANN()
         m_ippController->configANN(nbNeuronsPerHiddenLayer, learningRateSpinBox.value(), momentumSpinBox.value(), errorSpinBox.value(), kFoldCrossValidationCheckbox.isChecked(), kSpinBox.value());
         m_kFoldCrossValidation = kFoldCrossValidationCheckbox.isChecked();
         m_k = m_kFoldCrossValidation ? kSpinBox.value() : 0;
-        m_validationButton.setVisible(!m_k);
+        m_validationButton->setVisible(!m_k);
         emit goToNextState();
     }
 }
 
 void GraphicsScene::importANN()
 {
-    QString fileName = QFileDialog::getOpenFileName(&m_importButton,
+    QString fileName = QFileDialog::getOpenFileName(&*m_importButton,
                                                     tr("Open Existing ANN"),
                                                     "",
                                                     tr(QString("ANN (*.").append(SettingsNeuralNetwork::extension.c_str()).append(")").toStdString().c_str()));
@@ -589,7 +591,7 @@ void GraphicsScene::importANN()
 
 void GraphicsScene::exportANN()
 {
-    QString fileName = QFileDialog::getSaveFileName(&m_importButton,
+    QString fileName = QFileDialog::getSaveFileName(&*m_importButton,
                                                     tr("Save ANN"),
                                                     "",
                                                     tr(QString("ANN (*.").append(SettingsNeuralNetwork::extension.c_str()).append(")").toStdString().c_str()));
@@ -602,20 +604,20 @@ void GraphicsScene::exportANN()
 
 void GraphicsScene::selectTrainingSet()
 {
-    QString fileName = QFileDialog::getOpenFileName(&m_trainingButton,
+    QString fileName = QFileDialog::getOpenFileName(&*m_trainingButton,
                                                     tr("Open Training Set"),
                                                     "",
                                                     tr(QString("Training Set (*)").toStdString().c_str()));
     if(!fileName.isNull())
     {
         m_trainingQuantity = m_ippController->setTrainingSetPath(fileName);
-        m_startTrainingButton.setVisible(true);
+        m_startTrainingButton->setVisible(true);
     }
 }
 
 void GraphicsScene::selectValidationSet()
 {
-    QString fileName = QFileDialog::getOpenFileName(&m_validationButton,
+    QString fileName = QFileDialog::getOpenFileName(&*m_validationButton,
                                                     tr("Open Validation Set"),
                                                     "",
                                                     tr(QString("Validation Set (*)").toStdString().c_str()));
@@ -650,19 +652,19 @@ void GraphicsScene::stateChange()
     switch (m_currentState) {
     case START_MENU: // Start menu
         m_ippController->reset();
-        m_annGraphics.reset();
+        m_annGraphics->reset();
         m_futurePoints.clear();
         m_futurePointsKFoldCrossValidation.clear();
         m_timer->stop();
         m_draggedImage->pixmap(QPixmap(":images/draghere"));
         m_resultImage->setVisible(false);
-        m_resultLabel.setText("");
+        m_resultLabel->setText("");
         break;
     case SELECT_SETS_MENU: // Select sets menu
-        m_startTrainingButton.setVisible(false);
+        m_startTrainingButton->setVisible(false);
         break;
     case TRAINING_VIEW: // Training view (with graph)
-        m_nextButton.setVisible(false);
+        m_nextButton->setVisible(false);
         break;
     case MENU_MENU: // Main menu
         break;
@@ -679,13 +681,13 @@ void GraphicsScene::checkStatus()
         if(!m_futurePointsKFoldCrossValidation.isEmpty())
         {
             std::vector<std::vector<QPointF>> points = m_futurePointsKFoldCrossValidation.dequeue();
-            m_annGraphics.addPointKFoldCrossValidation(points);
+            m_annGraphics->addPointKFoldCrossValidation(points);
         }
         if(!m_futurePoints.isEmpty())
         {
             std::vector<QPointF> points = m_futurePoints.dequeue();
-            m_annGraphics.addPoint(points);
-            m_errorsLabel.setText(formatErrorsLabel(points));
+            m_annGraphics->addPoint(points);
+            m_errorsLabel->setText(formatErrorsLabel(points));
         }
     }
     else
@@ -693,15 +695,15 @@ void GraphicsScene::checkStatus()
         if(!m_futurePoints.isEmpty())
         {
             std::vector<QPointF> points = m_futurePoints.dequeue();
-            m_annGraphics.addPoint(points);
-            m_errorsLabel.setText(formatErrorsLabel(points));
+            m_annGraphics->addPoint(points);
+            m_errorsLabel->setText(formatErrorsLabel(points));
         }
     }
     // Enable next button if training is finished
     if(m_finished)
     {
-        m_stopTrainingButton.setVisible(false);
-        m_nextButton.setVisible(m_finished);
+        m_stopTrainingButton->setVisible(false);
+        m_nextButton->setVisible(m_finished);
         m_timer->stop();
     }
     m_mutex.unlock();
@@ -709,12 +711,12 @@ void GraphicsScene::checkStatus()
 
 void GraphicsScene::startTraining()
 {
-    m_stopTrainingButton.setVisible(true);
+    m_stopTrainingButton->setVisible(true);
     m_finished = false;
     m_timer->start();
-    m_annGraphics.addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
+    m_annGraphics->addCurve(std::make_tuple("Training Set Error", QPen(Qt::blue, 3)), m_k);
     if(m_ippController->hasValidationSet())
-        m_annGraphics.addCurve(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));
+        m_annGraphics->addCurve(std::make_tuple("Validation Set Error", QPen(Qt::red, 3)));
     m_ippController->startTraining();
     emit goToNextState();
 }
