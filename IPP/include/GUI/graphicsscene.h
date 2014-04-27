@@ -5,6 +5,8 @@
 #include "include/GUI/pixmap.h"
 #include "include/GUI/pushbutton.h"
 
+#include <memory>
+
 #include <QGraphicsScene>
 #include <QtWidgets>
 #include <QQueue>
@@ -80,12 +82,12 @@ private:
     PushButton m_backButton;
     QLabel m_errorsLabel;
     QLabel m_resultLabel;
-    Pixmap m_bg1;
-    Pixmap m_bg2;
-    Pixmap m_bg3;
-    Pixmap m_bg4;
-    Pixmap m_draggedImage;
-    Pixmap m_resultImage;
+    std::shared_ptr<Pixmap> m_bg1;
+    std::shared_ptr<Pixmap> m_bg2;
+    std::shared_ptr<Pixmap> m_bg3;
+    std::shared_ptr<Pixmap> m_bg4;
+    std::shared_ptr<Pixmap> m_draggedImage;
+    std::shared_ptr<Pixmap> m_resultImage;
 
     void stateChange();
 
