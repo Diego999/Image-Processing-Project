@@ -19,6 +19,8 @@
 #define MENU_MENU 3
 #define IMAGE_WIDHT 320
 #define IMAGE_HEIGHT 300
+#define LABEL_WIDHT 400
+#define LABEL_HEIGHT 64
 
 GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.width(), size.height()),
     m_currentState(0),
@@ -49,9 +51,9 @@ GraphicsScene::GraphicsScene(const QSize &size) : QGraphicsScene(0, 0, size.widt
 {
     setBackgroundBrush(this->palette().window());
     m_errorsLabel->setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
-    m_errorsLabel->resize(350, 64); // Values from test
+    m_errorsLabel->resize(LABEL_WIDHT, LABEL_HEIGHT); // Values from test
     m_resultLabel->setStyleSheet("* {background-color: #55FFFFFF; font-size: 15px; padding: 5px 9px;}");
-    m_resultLabel->resize(IMAGE_WIDHT + 20, 64); // Values from test
+    m_resultLabel->resize(LABEL_WIDHT, LABEL_HEIGHT); // Values from test
 }
 
 void GraphicsScene::createUI()
