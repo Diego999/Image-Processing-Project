@@ -1,6 +1,6 @@
 QT       += core gui widgets
 
-TARGET = Test
+TARGET = IPP
 TEMPLATE = app
 
 win32 {

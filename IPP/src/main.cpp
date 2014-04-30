@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
         GraphicsView view(scene);
         view.resize(size);
         view.setFixedSize(size);
+        view.setWindowTitle("IPP - Diego Antognini & Alexandre Perez © DAP Industries");
         view.show();
 
         IPPController ippc(*scene);
