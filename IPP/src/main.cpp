@@ -19,14 +19,14 @@ int main(int argc, char* argv[])
     {
         const QSize size(800, 700);
         QApplication app(argc, argv);
-        GraphicsScene scene(size);
-        scene.createUI();
-        GraphicsView view(&scene);
+        GraphicsScene* scene = new GraphicsScene(size);
+        scene->createUI();
+        GraphicsView view(scene);
         view.resize(size);
         view.setFixedSize(size);
         view.show();
 
-        IPPController ippc(scene);
+        IPPController ippc(*scene);
 
         return app.exec();
     }
